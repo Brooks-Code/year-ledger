@@ -8,12 +8,13 @@ import java.util.List;
 
 /**
  * TODO
+ *
  * @Author Brooks Cole
  * @Date 2026/7/22 10:29
  */
 @Mapper
 public interface UserMapper {
 
-    @Select("select * from users")
+    @Select("SELECT * FROM users")
     List<User> findAll();
 }
