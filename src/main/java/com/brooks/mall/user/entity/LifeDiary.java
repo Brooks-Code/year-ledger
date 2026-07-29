@@ -15,13 +15,34 @@ public class LifeDiary implements Serializable {
 
     /**
      * 主键ID（雪花算法生成）
-     * 注意：使用 Long 类型接收雪花ID
      */
     private Long id;
 
     /**
+     * 创建时间
+     * 对应数据库 timestamp，通常由数据库自动维护
+     */
+    private LocalDateTime createdAt;
+
+    /**
+     * 创建人ID
+     */
+    private String createdBy;
+
+    /**
+     * 更新时间
+     * 对应数据库 datetime，需手动设置
+     */
+    private LocalDateTime updatedAt;
+
+    /**
+     * 更新人ID
+     */
+    private String updatedBy;
+
+    /**
      * 日记日期
-     * 对应数据库 date 类型
+     * ⚠️ 注意：数据库是 date 类型，Java 推荐用 LocalDate
      */
     private LocalDate diaryDate;
 
@@ -32,19 +53,7 @@ public class LifeDiary implements Serializable {
 
     /**
      * 日记正文
-     * 对应数据库 text 类型
      */
     private String content;
 
-    /**
-     * 创建时间
-     * 数据库默认 CURRENT_TIMESTAMP，但建议Java层也赋值以保持一致性
-     */
-    private LocalDateTime createdAt;
-
-    /**
-     * 更新时间
-     * 由Java代码维护
-     */
-    private LocalDateTime updatedAt;
 }

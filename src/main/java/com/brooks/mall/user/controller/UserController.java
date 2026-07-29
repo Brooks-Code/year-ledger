@@ -4,6 +4,7 @@ import com.brooks.mall.user.entity.User;
 import com.brooks.mall.user.service.impl.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -15,6 +16,7 @@ import java.util.List;
  * @Date 2026/7/22 10:29
  */
 @RestController // 返回 JSON 数据
+@RequestMapping("/api") // 对应前端的 /api 代理前缀
 public class UserController {
 
     @Autowired
@@ -24,4 +26,5 @@ public class UserController {
     public List<User> listUsers() {
         return userService.getUsers();
     }
+
 }

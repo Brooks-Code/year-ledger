@@ -12,8 +12,8 @@ import static com.brooks.mall.user.util.MyJDBCSql.getConnection;
  * @Author mr.yang
  * @Date 2026/7/22 13:36
  */
-public class SqlUtil {
-    private SqlUtil() {
+public class DBApi {
+    private DBApi() {
     }
     // 雪花ID生成器
     private static final SnowflakeIdGenerator ID_GENERATOR = new SnowflakeIdGenerator(1, 1);

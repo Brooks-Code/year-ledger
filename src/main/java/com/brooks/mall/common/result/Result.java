@@ -41,15 +41,15 @@ public class Result<T> implements Serializable {
 
     // ==================== 失败响应 ====================
 
-    public static <T> Result<T> fail(ResultCode resultCode) {
+    public static <T> Result<T> error(ResultCode resultCode) {
         return new Result<>(resultCode.getCode(), resultCode.getMessageTemplate(), null);
     }
 
-    public static <T> Result<T> fail(ResultCode resultCode, Object... args) {
+    public static <T> Result<T> error(ResultCode resultCode, Object... args) {
         return new Result<>(resultCode.getCode(), resultCode.format(args), null);
     }
 
-    public static <T> Result<T> fail(int code, String msg) {
+    public static <T> Result<T> error(int code, String msg) {
         return new Result<>(code, msg, null);
     }
 

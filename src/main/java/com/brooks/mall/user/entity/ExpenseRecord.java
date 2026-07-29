@@ -1,9 +1,9 @@
 package com.brooks.mall.user.entity;
 
 import lombok.Data;
+
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 /**
@@ -19,6 +19,16 @@ public class ExpenseRecord implements Serializable {
      * 对应数据库 bigint(20)
      */
     private Long id;
+    /**
+     * 记录创建时间
+     * 对应数据库 timestamp，由数据库自动维护默认值
+     */
+    private LocalDateTime createdAt;
+    /**
+     * 创建人ID
+     * 对应数据库 bigint(20)
+     */
+    private String createdBy;
 
     /**
      * 花销金额，保留两位小数
@@ -35,21 +45,17 @@ public class ExpenseRecord implements Serializable {
      * 消费日期（方便按天/月统计）
      * 对应数据库 date 类型
      */
-    private LocalDate expenseDate;
+    private LocalDateTime expenseDate;
 
     /**
      * 简短备注，如：和同事吃火锅
      */
-    private String description;
+    private String remark;
 
     /**
      * 支付方式：微信、支付宝、现金、信用卡
      */
     private String paymentMethod;
 
-    /**
-     * 记录创建时间
-     * 对应数据库 timestamp，由数据库自动维护默认值
-     */
-    private LocalDateTime createdAt;
+
 }
