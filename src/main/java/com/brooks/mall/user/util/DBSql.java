@@ -1,99 +1,200 @@
 package com.brooks.mall.user.util;
 
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
+
 import java.sql.*;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
- * TODO
- * @ClassName DBSql
+ * 数据库操作工具类 (基于 HikariCP + 原生 JDBC + 雪花ID自动注入)
  * @Author Brooks Cole
- * @Date 2026/7/24 14:36
  */
 public class DBSql {
 
-    /**
-     * 获取数据库连接
-     */
-    public static Connection getConnection() throws SQLException {
-        String url = ConfigLoader.get("spring.datasource.url");
-        String username = ConfigLoader.get("spring.datasource.username");
-        String password = ConfigLoader.get("spring.datasource.password");
+    private static final HikariDataSource DATA_SOURCE;
+    private static final SnowflakeIdGenerator ID_WORKER = new SnowflakeIdGenerator(1,1);
 
-        // 1. 使用 Properties 统一封装连接参数
-        Properties props = new Properties();
-        props.setProperty("user", username);
-        props.setProperty("password", password);
+    // 匹配 INSERT 语句中字段列表的正则（忽略大小写）
+    private static final Pattern INSERT_COLUMNS_PATTERN =
+            Pattern.compile("INSERT\\s+INTO\\s+\\S+\\s*\\(([^)]+)\\)", Pattern.CASE_INSENSITIVE);
 
-        // 2. 设置字符集和时区，防止中文乱码和时间差
-        props.setProperty("useUnicode", "true");
-        props.setProperty("characterEncoding", "UTF-8");
-        props.setProperty("serverTimezone", "Asia/Shanghai");
+    // ==================== 1. 连接池初始化 ====================
+    static {
+        HikariConfig config = new HikariConfig();
+        config.setJdbcUrl(ConfigLoader.get("spring.datasource.url"));
+        config.setUsername(ConfigLoader.get("spring.datasource.username"));
+        config.setPassword(ConfigLoader.get("spring.datasource.password"));
 
-        // 3. 使用 Class.forName 动态加载驱动，兼容 MySQL 5.x 和 8.x
-        try {
-            Class.forName("com.mysql.cj.jdbc.Driver"); // 8.x 推荐
-        } catch (ClassNotFoundException e) {
-            // 如果 8.x 驱动不存在，尝试加载 5.x 驱动
-            try {
-                Class.forName("com.mysql.jdbc.Driver");
-            } catch (ClassNotFoundException ex) {
-                throw new SQLException("未找到 MySQL JDBC 驱动，请检查 classpath", ex);
-            }
-        }
+        config.setMaximumPoolSize(20);
+        config.setMinimumIdle(5);
+        config.setIdleTimeout(300000);
+        config.setMaxLifetime(1800000);
+        config.setConnectionTimeout(30000);
 
-        // 4. 使用 DriverManager 获取连接（标准做法）
-        return DriverManager.getConnection(url, props);
+        config.addDataSourceProperty("useUnicode", "true");
+        config.addDataSourceProperty("characterEncoding", "UTF-8");
+        config.addDataSourceProperty("serverTimezone", "Asia/Shanghai");
+
+        DATA_SOURCE = new HikariDataSource(config);
     }
 
+    public static Connection getConnection() throws SQLException {
+        return DATA_SOURCE.getConnection();
+    }
+
+    // ==================== 2. 增 / 改 (Create & Update) ====================
+
     /**
-     * 支持参数的更新方法
+     * 执行 INSERT / UPDATE 语句
+     * ✅ INSERT 时若 id 字段对应参数为 null，自动生成雪花ID并替换
      */
     public static int update(String sql, Object... params) {
+        Object[] finalParams = autoFillSnowflakeId(sql, params);
         try (Connection conn = getConnection();
-             PreparedStatement statement = conn.prepareStatement(sql)) {
-
-            // 动态设置参数
-            for (int i = 0; i < params.length; i++) {
-                statement.setObject(i + 1, params[i]);
-            }
-
-            return statement.executeUpdate();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            setParameters(ps, finalParams);
+            return ps.executeUpdate();
         } catch (SQLException e) {
-            throw new RuntimeException("SQL执行失败: " + sql, e);
+            throw new RuntimeException("SQL更新失败: " + sql, e);
         }
     }
 
-
     /**
-     * JDBC 查询数据库（返回 List<Map>）
+     * 批量执行 INSERT / UPDATE（带事务）
+     * ✅ 每组参数都会独立检查并填充雪花ID
      */
-    public static List<Map<String, Object>> getSql(String getSql) {
-        List<Map<String, Object>> dataList = new ArrayList<>();
-
-        // 1. 将 ResultSet 也放入 try-with-resources 中，确保它被自动关闭
+    public static int[] batchUpdate(String sql, List<Object[]> paramsList) {
         try (Connection conn = getConnection();
-             PreparedStatement statement = conn.prepareStatement(getSql);
-             ResultSet resultSet = statement.executeQuery()) {
-
-            // 2. 将元数据（MetaData）的获取移到循环外面
-            ResultSetMetaData metaData = resultSet.getMetaData();
-            int columnCount = metaData.getColumnCount();
-
-            // 3. 循环内部只负责取值，避免重复获取元数据
-            while (resultSet.next()) {
-                Map<String, Object> dataMap = new HashMap<>(columnCount); // 指定初始容量，减少扩容开销
-                for (int i = 1; i <= columnCount; i++) {
-                    String columnName = metaData.getColumnName(i);
-                    Object columnValue = resultSet.getObject(i); // 使用 getObject 保留原始数据类型
-                    dataMap.put(columnName, columnValue);
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            conn.setAutoCommit(false);
+            try {
+                for (Object[] params : paramsList) {
+                    Object[] finalParams = autoFillSnowflakeId(sql, params);
+                    setParameters(ps, finalParams);
+                    ps.addBatch();
                 }
-                dataList.add(dataMap);
+                int[] results = ps.executeBatch();
+                conn.commit();
+                return results;
+            } catch (SQLException e) {
+                conn.rollback();
+                throw e;
+            } finally {
+                conn.setAutoCommit(true);
             }
-
         } catch (SQLException e) {
-            // 5. 优化异常信息，带上 SQL 方便排查
-            throw new RuntimeException("SQL查询失败: " + getSql, e);
+            throw new RuntimeException("SQL批量更新失败: " + sql, e);
+        }
+    }
+
+    // ==================== 3. 删 (Delete) ====================
+
+    public static int deleteById(String tableName, Long id) {
+        String sql = "DELETE FROM " + tableName + " WHERE id = ?";
+        return update(sql, id);
+    }
+
+    public static int deleteByIds(String tableName, Collection<Long> ids) {
+        if (ids == null || ids.isEmpty()) return 0;
+        String placeholders = String.join(",", Collections.nCopies(ids.size(), "?"));
+        String sql = "DELETE FROM " + tableName + " WHERE id IN (" + placeholders + ")";
+        return update(sql, ids.toArray());
+    }
+
+    // ==================== 4. 查 (Read) ====================
+
+    public static List<Map<String, Object>> query(String sql, Object... params) {
+        List<Map<String, Object>> dataList = new ArrayList<>();
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            setParameters(ps, params);
+            try (ResultSet rs = ps.executeQuery()) {
+                ResultSetMetaData meta = rs.getMetaData();
+                int columnCount = meta.getColumnCount();
+                while (rs.next()) {
+                    Map<String, Object> row = new LinkedHashMap<>(columnCount);
+                    for (int i = 1; i <= columnCount; i++) {
+                        row.put(meta.getColumnLabel(i).toLowerCase(), rs.getObject(i));
+                    }
+                    dataList.add(row);
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("SQL查询失败: " + sql, e);
         }
         return dataList;
+    }
+
+    public static Map<String, Object> pageQuery(String baseSql, int pageNum, int pageSize, Object... params) {
+        Map<String, Object> result = new HashMap<>(4);
+        int offset = (pageNum - 1) * pageSize;
+
+        String countSql = baseSql.replaceAll("(?i)^SELECT\\s+.+?\\s+FROM", "SELECT COUNT(*) FROM");
+        List<Map<String, Object>> countResult = query(countSql, params);
+        long total = ((Number) countResult.get(0).values().iterator().next()).longValue();
+
+        String pageSql = baseSql + " LIMIT ? OFFSET ?";
+        Object[] pageParams = Arrays.copyOf(params, params.length + 2);
+        pageParams[params.length] = pageSize;
+        pageParams[params.length + 1] = offset;
+        List<Map<String, Object>> records = query(pageSql, pageParams);
+
+        result.put("total", total);
+        result.put("records", records);
+        result.put("pageNum", pageNum);
+        result.put("pageSize", pageSize);
+        return result;
+    }
+
+    // ==================== 5. 雪花ID自动填充核心逻辑 ====================
+
+    /**
+     * 智能填充雪花ID：
+     * 1. 仅对 INSERT 语句生效
+     * 2. 解析字段列表，找到 id 字段的索引位置
+     * 3. 若该位置参数为 null，则生成雪花ID替换
+     * 4. 若非 INSERT 或无 id 字段，原样返回参数
+     */
+    private static Object[] autoFillSnowflakeId(String sql, Object... params) {
+        if (params == null || params.length == 0) return params;
+
+        Matcher matcher = INSERT_COLUMNS_PATTERN.matcher(sql.trim());
+        if (!matcher.find()) return params; // 非 INSERT 语句，直接返回
+
+        String columnsStr = matcher.group(1);
+        String[] columns = columnsStr.split(",");
+
+        int idIndex = -1;
+        for (int i = 0; i < columns.length; i++) {
+            if ("id".equalsIgnoreCase(columns[i].trim())) {
+                idIndex = i;
+                break;
+            }
+        }
+
+        // SQL 中没有 id 字段，或参数个数不匹配，不干预
+        if (idIndex < 0 || idIndex >= params.length) return params;
+
+        // ⭐️ 核心：仅在参数为 null 时生成雪花ID，已有值则保留
+        if (params[idIndex] == null) {
+            Object[] newParams = Arrays.copyOf(params, params.length);
+            newParams[idIndex] = ID_WORKER.nextId();
+            return newParams;
+        }
+
+        return params;
+    }
+
+    // ==================== 6. 内部工具方法 ====================
+
+    private static void setParameters(PreparedStatement ps, Object... params) throws SQLException {
+        if (params != null) {
+            for (int i = 0; i < params.length; i++) {
+                ps.setObject(i + 1, params[i]);
+            }
+        }
     }
 }

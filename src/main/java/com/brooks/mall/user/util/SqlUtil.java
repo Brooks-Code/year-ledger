@@ -4,7 +4,7 @@ import java.sql.*;
 import java.util.*;
 import java.util.regex.Pattern;
 
-import static com.brooks.mall.user.util.DBSql.getConnection;
+import static com.brooks.mall.user.util.MyJDBCSql.getConnection;
 
 /**
  * TODO
