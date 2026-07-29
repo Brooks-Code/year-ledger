@@ -93,4 +93,16 @@
 
     </dependencies>
 
+    <!--  配置打包 -->
+    <build>
+        <!-- 👇 这里改成你想要的名字，不需要加 .jar 后缀 -->
+        <finalName>year-ledger</finalName>
+
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
 </project>
