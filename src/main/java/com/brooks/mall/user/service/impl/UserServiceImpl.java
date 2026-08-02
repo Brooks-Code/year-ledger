@@ -1,8 +1,8 @@
-package com.brooks.mall.user.service;
+package com.brooks.mall.user.service.impl;
 
 import com.brooks.mall.user.entity.User;
 import com.brooks.mall.user.mapper.UserMapper;
-import com.brooks.mall.user.service.impl.UserService;
+import com.brooks.mall.user.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

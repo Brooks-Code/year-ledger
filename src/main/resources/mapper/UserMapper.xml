@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.brooks.mall.user.mapper.UserMapper">
+
+    <!-- 2. 新增插入语句 (Register用) -->
+    <insert id="insertUser" parameterType="com.brooks.mall.user.entity.User">
+        INSERT INTO orguser (
+        id,
+        created_at,
+        created_by,
+        userid,
+        username,
+        password,
+        email,
+        mobile,
+        status,
+        is_deleted
+        ) VALUES (
+        #{id},
+        NOW(),
+        '0',
+        #{userid},
+        #{username},
+        #{password},
+        #{email},
+        #{mobile},
+        1,
+        0
+        )
+    </insert>
+</mapper>

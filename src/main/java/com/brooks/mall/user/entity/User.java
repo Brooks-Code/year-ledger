@@ -1,6 +1,7 @@
 package com.brooks.mall.user.entity;
 
 import lombok.Data;
+
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
@@ -72,4 +73,19 @@ public class User implements Serializable {
      * 删除标记: 0-未删除, 1-已删除
      */
     private Integer isDeleted;
+    /**
+     * 真实姓名
+     */
+    private String realName;
+
+    /**
+     * 身份证号码
+     */
+    private String idCard;
+
+    /**
+     * 用户头像URL
+     */
+    private String avatar;
+
 }

@@ -3,7 +3,8 @@ package com.brooks.mall.user.controller;
 import com.brooks.mall.common.result.Result;
 import com.brooks.mall.user.dto.LoginRequest;
 import com.brooks.mall.user.dto.LoginResponse;
-import com.brooks.mall.user.service.AuthService;
+import com.brooks.mall.user.dto.UserRegisterRequest;
+import com.brooks.mall.user.service.impl.AuthServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -17,11 +18,20 @@ import javax.validation.Valid;
 @RequiredArgsConstructor
 public class AuthController {
 
-    private final AuthService authService;
+    private final AuthServiceImpl authService;
 
     @PostMapping("/login")
     public Result<LoginResponse> login(@Valid @RequestBody LoginRequest request) {
         LoginResponse response = authService.login(request);
         return Result.success(response);
+    }
+
+    /**
+     * 用户注册
+     */
+    @PostMapping("/register")
+    public Result<Void> register(@Valid @RequestBody UserRegisterRequest request) {
+        authService.register(request);
+        return Result.success();
     }
 }

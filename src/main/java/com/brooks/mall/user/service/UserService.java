@@ -1,4 +1,4 @@
-package com.brooks.mall.user.service.impl;
+package com.brooks.mall.user.service;
 
 import com.brooks.mall.user.entity.User;
 

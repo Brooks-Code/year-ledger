@@ -1,9 +1,9 @@
-package com.brooks.mall.user.service;
+package com.brooks.mall.user.service.impl;
 
 import com.brooks.mall.user.dto.ExpenseRecordDTO;
 import com.brooks.mall.user.entity.ExpenseRecord;
 import com.brooks.mall.user.mapper.ExpenseMapper;
-import com.brooks.mall.user.service.impl.ExpenseService;
+import com.brooks.mall.user.service.ExpenseService;
 import com.brooks.mall.user.util.SnowflakeIdGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

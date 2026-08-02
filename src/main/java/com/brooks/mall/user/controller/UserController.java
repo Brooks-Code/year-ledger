@@ -1,7 +1,7 @@
 package com.brooks.mall.user.controller;
 
 import com.brooks.mall.user.entity.User;
-import com.brooks.mall.user.service.impl.UserService;
+import com.brooks.mall.user.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;

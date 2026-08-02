@@ -3,7 +3,7 @@ package com.brooks.mall.user.controller;
 import com.brooks.mall.common.result.Result;
 import com.brooks.mall.common.result.ResultCode;
 import com.brooks.mall.user.dto.ExpenseRecordDTO;
-import com.brooks.mall.user.service.impl.ExpenseService;
+import com.brooks.mall.user.service.ExpenseService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;

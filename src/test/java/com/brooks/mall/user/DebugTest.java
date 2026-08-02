@@ -1,11 +1,9 @@
 package com.brooks.mall.user;
 
 import com.alibaba.fastjson.JSONObject;
-import com.brooks.mall.user.util.DBApi;
 import com.brooks.mall.user.util.ZhiPuAPIUtil;
-
-import java.util.HashMap;
-import java.util.Map;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 /**
  * TODO
@@ -15,12 +13,15 @@ import java.util.Map;
  */
 public class DebugTest {
     public static void main(String[] args) {
-        Map<String, Object> map = new HashMap<>();
+        /*Map<String, Object> map = new HashMap<>();
         map.put("userid", "admin");
         map.put("username", "管理员");
         map.put("password", "1");
         int i = DBApi.create("orguser", "admin", map);
-        System.out.println(i);
+        System.out.println(i);*/
+        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+        String encode = passwordEncoder.encode("11");
+        System.out.println(encode);
     }
     private static void getSql() {
         String sql = "select RWBH,ZXZT,RWMC from BO_EU_HY_DBRW where ZXZT IN('2','3','6')";
