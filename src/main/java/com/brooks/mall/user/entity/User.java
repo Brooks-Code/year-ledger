@@ -65,15 +65,6 @@ public class User implements Serializable {
     private String mobile;
 
     /**
-     * 状态: 1-正常, 0-禁用, 2-待激活
-     */
-    private Integer status;
-
-    /**
-     * 删除标记: 0-未删除, 1-已删除
-     */
-    private Integer isDeleted;
-    /**
      * 真实姓名
      */
     private String realName;
@@ -87,5 +78,15 @@ public class User implements Serializable {
      * 用户头像URL
      */
     private String avatar;
+
+    /**
+     * 状态: 1-正常, 0-禁用, 2-待激活
+     */
+    private Integer status;
+
+    /**
+     * 删除标记: 0-未删除, 1-已删除
+     */
+    private Integer isDeleted;
 
 }

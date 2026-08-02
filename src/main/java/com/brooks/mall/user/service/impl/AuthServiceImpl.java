@@ -8,11 +8,13 @@ import com.brooks.mall.user.exception.BusinessException;
 import com.brooks.mall.user.mapper.UserMapper;
 import com.brooks.mall.user.service.AuthService;
 import com.brooks.mall.user.util.JwtUtil;
+import com.brooks.mall.user.util.SnowflakeIdGenerator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -22,7 +24,6 @@ import java.util.Map;
 public class AuthServiceImpl implements AuthService {
 
     private final UserMapper userMapper;
-    // 假设你已有 JwtUtil 和 PasswordEncoder (如BCrypt)
     private final JwtUtil jwtUtil;
     private final PasswordEncoder passwordEncoder;
 
@@ -45,10 +46,19 @@ public class AuthServiceImpl implements AuthService {
 
         // 3. 构建实体对象
         User user = new User();
+        long id = new SnowflakeIdGenerator(1, 1).nextId();
+        user.setId(id);
+        user.setCreatedAt(LocalDateTime.now());
+        user.setCreatedBy(request.getUserid());
+        user.setUpdatedAt(LocalDateTime.now());
+        user.setUpdatedBy(request.getUserid());
         user.setUserid(request.getUserid());
-        user.setUsername(request.getUsername());
+        user.setUsername("");
         user.setEmail(request.getEmail());
         user.setMobile(request.getMobile());
+        user.setRealName(request.getRealName());
+        user.setIdCard(request.getIdCard());
+        user.setAvatar(request.getAvatar());
 
         // 【核心】BCrypt 加密
         user.setPassword(passwordEncoder.encode(request.getPassword()));

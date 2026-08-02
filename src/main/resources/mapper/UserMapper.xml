@@ -6,26 +6,30 @@
     <insert id="insertUser" parameterType="com.brooks.mall.user.entity.User">
         INSERT INTO orguser (
         id,
-        created_at,
         created_by,
         userid,
         username,
         password,
-        email,
-        mobile,
+        <if test="email != null and email != ''">email,</if>
+        <if test="mobile != null and mobile != ''">mobile,</if>
+        <if test="realName != null and realName != ''">real_name,</if>
+        <if test="idCard != null and idCard != ''">id_card,</if>
+        <if test="avatar != null and avatar != ''">avatar,</if>
         status,
         is_deleted
         ) VALUES (
         #{id},
-        NOW(),
         '0',
         #{userid},
         #{username},
         #{password},
-        #{email},
-        #{mobile},
-        1,
-        0
+        <if test="email != null and email != ''">#{email},</if>
+        <if test="mobile != null and mobile != ''">#{mobile},</if>
+        <if test="realName != null and realName != ''">#{realName},</if>
+        <if test="idCard != null and idCard != ''">#{idCard},</if>
+        <if test="avatar != null and avatar != ''">#{avatar},</if>
+        #{status},
+        #{isDeleted}
         )
     </insert>
 </mapper>
