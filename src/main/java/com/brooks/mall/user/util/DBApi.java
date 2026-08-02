@@ -4,8 +4,6 @@ import java.sql.*;
 import java.util.*;
 import java.util.regex.Pattern;
 
-import static com.brooks.mall.user.util.MyJDBCSql.getConnection;
-
 /**
  * TODO
  *
@@ -94,7 +92,7 @@ public class DBApi {
         String sql = "INSERT INTO " + tableName.trim() + " " + colJoiner + " VALUES " + valJoiner;
 
         // 3. 执行
-        try (Connection conn = getConnection();
+        try (Connection conn = MyJDBCSql.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             for (int i = 0; i < params.size(); i++) {
                 Object val = params.get(i);

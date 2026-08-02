@@ -2,6 +2,7 @@ package com.brooks.mall.user.mapper;
 
 import com.brooks.mall.user.entity.User;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
@@ -14,6 +15,13 @@ import java.util.List;
  */
 @Mapper
 public interface UserMapper {
+
+    /**
+     * 根据用户名查询未删除的用户
+     * 注意：SQL中显式过滤 is_deleted，这是安全底线
+     */
+    @Select("SELECT * FROM orguser WHERE username = #{username} AND is_deleted = 0 LIMIT 1")
+    User selectByUsername(@Param("username") String username);
 
     @Select("SELECT * FROM orguser")
     List<User> findAll();

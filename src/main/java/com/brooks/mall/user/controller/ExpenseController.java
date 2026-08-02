@@ -34,7 +34,7 @@ public class ExpenseController {
         if (success) {
             return Result.success("保存成功");
         } else {
-            return Result.error(ResultCode.INTERNAL_ERROR.getCode(),"保存失败");
+            return Result.fail(ResultCode.INTERNAL_ERROR.getCode(),"保存失败");
         }
     }
 }
