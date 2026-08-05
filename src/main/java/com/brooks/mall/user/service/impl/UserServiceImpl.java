@@ -11,8 +11,10 @@ import com.brooks.mall.user.util.JwtUtil;
 import com.brooks.mall.user.util.SnowflakeIdGenerator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -30,6 +32,7 @@ import java.util.Map;
 @RequiredArgsConstructor // 自动注入构造函数
 public class UserServiceImpl implements UserService {
 
+    @Autowired
     private UserMapper userMapper;
     private final JwtUtil jwtUtil;
     private final PasswordEncoder passwordEncoder;
@@ -44,28 +47,34 @@ public class UserServiceImpl implements UserService {
 
         // 2. 检查唯一性 (防止并发问题或绕过前端校验)
         // 注意：这里简单演示，实际生产环境建议在数据库层面利用 UNIQUE KEY 报错来兜底
-        if (userMapper.selectByUsername(request.getUserid()) != null) {
+        if (userMapper.selectByUsername(request.getUserName()) != null) {
             throw new BusinessException("用户ID已存在");
         }
 
         // 如果邮箱/手机号也是必填且唯一的，也需要在这里检查
-        // if (StringUtils.hasText(request.getEmail()) && userMapper.selectByEmail(request.getEmail()) != null) ...
+         if (StringUtils.hasText(request.getEmail()) && userMapper.selectByEmail(request.getEmail()) != null){
+             throw new BusinessException("邮箱已存在");
+         }
+         if (StringUtils.hasText(request.getMobile()) && userMapper.selectByMobile(request.getMobile()) != null){
+             throw new BusinessException("手机号已存在");
+         }
 
         // 3. 构建实体对象
         User user = new User();
         long id = new SnowflakeIdGenerator(1, 1).nextId();
         user.setId(id);
         user.setCreatedAt(LocalDateTime.now());
-        user.setCreatedBy(request.getUserid());
+        user.setCreatedBy(request.getUserName());
         user.setUpdatedAt(LocalDateTime.now());
-        user.setUpdatedBy(request.getUserid());
-        user.setUserid(request.getUserid());
-        user.setUsername("");
+        user.setUpdatedBy(request.getUserName());
+        user.setUserid(request.getUserName());
+        user.setUsername(request.getRealName());
         user.setEmail(request.getEmail());
         user.setMobile(request.getMobile());
         user.setRealName(request.getRealName());
         user.setIdCard(request.getIdCard());
         user.setAvatar(request.getAvatar());
+        user.setAvatar("http://11");
 
         // 【核心】BCrypt 加密
         user.setPassword(passwordEncoder.encode(request.getPassword()));
@@ -79,7 +88,7 @@ public class UserServiceImpl implements UserService {
         // 4. 执行插入
         try {
             userMapper.insertUser(user);
-            log.info("用户注册成功: {}", request.getUserid());
+            log.info("用户注册成功: {}", request.getRealName());
         } catch (Exception e) {
             // 捕获数据库唯一索引冲突异常（如 userid 重复）
             log.error("注册失败", e);
@@ -94,8 +103,8 @@ public class UserServiceImpl implements UserService {
      * @return 登录响应数据
      */
     public LoginResponse login(LoginRequest request) {
-        // 1. 查询用户（已过滤逻辑删除）
-        User user = userMapper.selectByUsername(request.getUserid());
+        // 1. 查询用户
+        User user = userMapper.selectByUsername(request.getUserName());
         if (user == null) {
             // 安全最佳实践：不提示"用户不存在"，统一提示
             throw new BusinessException("用户名或密码错误");
@@ -143,6 +152,6 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<User> getUsers() {
         // 调用 Mapper 里的查询方法
-        return userMapper.findAll();
+       return userMapper.findAll();
     }
 }

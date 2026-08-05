@@ -1,6 +1,7 @@
 package com.brooks.mall.user;
 
 import com.alibaba.fastjson.JSONObject;
+import com.brooks.mall.user.util.SnowflakeIdGenerator;
 import com.brooks.mall.user.util.ZhiPuAPIUtil;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -19,6 +20,9 @@ public class DebugTest {
         map.put("password", "1");
         int i = DBApi.create("orguser", "admin", map);
         System.out.println(i);*/
+        SnowflakeIdGenerator generator = new SnowflakeIdGenerator(1, 1);
+        long id = generator.nextId();
+        System.out.println(id);
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
         String encode = passwordEncoder.encode("11");
         System.out.println(encode);

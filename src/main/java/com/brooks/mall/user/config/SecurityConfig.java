@@ -7,7 +7,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 /**
  * TODO
- *  注册 Bean
+ *  注册 Bean 作用：密码加密
  * @Author mr.yang
  * @Date 2026/7/31 10:28
  */

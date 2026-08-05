@@ -14,7 +14,7 @@ public class UserRegisterRequest {
      */
     @NotBlank(message = "登录账号不能为空")
     @Size(min = 3, max = 32, message = "账号长度必须在3-32位之间")
-    private String userid;
+    private String userName;
 
     /**
      * 真实姓名 (对应 real_name)
