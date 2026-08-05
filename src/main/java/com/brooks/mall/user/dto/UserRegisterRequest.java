@@ -54,8 +54,10 @@ public class UserRegisterRequest {
     /**
      * 邮箱 (对应 email)
      */
-    @NotBlank(message = "邮箱不能为空")
-    @Pattern(regexp = "^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(\\.[a-zA-Z0-9_-]+)+$", message = "邮箱格式不正确")
+    @Pattern(
+            regexp = "^([a-zA-Z0-9_\\-]+@[a-zA-Z0-9_\\-]+(\\.[a-zA-Z0-9_\\-]+)+)$|^$",
+            message = "邮箱格式不正确"
+    )
     private String email;
 
     /**

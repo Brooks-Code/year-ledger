@@ -4,7 +4,7 @@ import com.brooks.mall.common.result.Result;
 import com.brooks.mall.user.dto.LoginRequest;
 import com.brooks.mall.user.dto.LoginResponse;
 import com.brooks.mall.user.dto.UserRegisterRequest;
-import com.brooks.mall.user.service.impl.AuthServiceImpl;
+import com.brooks.mall.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -18,11 +18,11 @@ import javax.validation.Valid;
 @RequiredArgsConstructor
 public class AuthController {
 
-    private final AuthServiceImpl authService;
+    private final UserService userService;
 
     @PostMapping("/login")
     public Result<LoginResponse> login(@Valid @RequestBody LoginRequest request) {
-        LoginResponse response = authService.login(request);
+        LoginResponse response = userService.login(request);
         return Result.success(response);
     }
 
@@ -31,7 +31,7 @@ public class AuthController {
      */
     @PostMapping("/register")
     public Result<Void> register(@Valid @RequestBody UserRegisterRequest request) {
-        authService.register(request);
+        userService.register(request);
         return Result.success();
     }
 }

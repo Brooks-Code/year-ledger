@@ -6,7 +6,10 @@
     <insert id="insertUser" parameterType="com.brooks.mall.user.entity.User">
         INSERT INTO orguser (
         id,
+        created_at,
         created_by,
+        updated_at,
+        updated_by,
         userid,
         username,
         password,
@@ -19,7 +22,10 @@
         is_deleted
         ) VALUES (
         #{id},
-        '0',
+        #{createdAt},
+        #{createdBy},
+        #{updatedAt},
+        #{updatedBy},
         #{userid},
         #{username},
         #{password},
