@@ -14,12 +14,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
  */
 public class DebugTest {
     public static void main(String[] args) {
-        /*Map<String, Object> map = new HashMap<>();
-        map.put("userid", "admin");
-        map.put("username", "管理员");
-        map.put("password", "1");
-        int i = DBApi.create("orguser", "admin", map);
-        System.out.println(i);*/
         SnowflakeIdGenerator generator = new SnowflakeIdGenerator(1, 1);
         long id = generator.nextId();
         System.out.println(id);

@@ -19,9 +19,10 @@ public class WebMvcConfig implements WebMvcConfigurer {
                 .addPathPatterns("/**")
                 // 排除以下路径
                 .excludePathPatterns(
-                        "/user/login",      // 登录接口
-                        "/user/register",   // 注册接口
-                        "/doc.html"         // Swagger/Knife4j 文档页面
+                        "/api/auth/login",      // 排除登录
+                        "/api/auth/register",   // 排除注册
+                        "/doc.html",            // 排除 Swagger 文档等
+                        "/webjars/**"
                 );
     }
 }

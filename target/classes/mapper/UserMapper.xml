@@ -5,35 +5,27 @@
     <!-- 2. 新增插入语句 (Register用) -->
     <insert id="insertUser" parameterType="com.brooks.mall.user.entity.User">
         INSERT INTO orguser (
-        id,
-        created_at,
-        created_by,
-        updated_at,
-        updated_by,
-        userid,
-        username,
-        password,
-        <if test="email != null and email != ''">email,</if>
-        <if test="mobile != null and mobile != ''">mobile,</if>
-        <if test="realName != null and realName != ''">real_name,</if>
-        <if test="idCard != null and idCard != ''">id_card,</if>
-        <if test="avatar != null and avatar != ''">avatar,</if>
+        id, created_at, created_by, updated_at, updated_by,
+        userid, username, password,
+        <!-- 可选字段加上 if 判断 -->
+        <if test="email != null">email,</if>
+        <if test="mobile != null">mobile,</if>
+        <if test="realName != null">real_name,</if>
+        <if test="idCard != null">id_card,</if>
+        <if test="avatar != null">avatar,</if>
+
         status,
         is_deleted
         ) VALUES (
-        #{id},
-        #{createdAt},
-        #{createdBy},
-        #{updatedAt},
-        #{updatedBy},
-        #{userid},
-        #{username},
-        #{password},
-        <if test="email != null and email != ''">#{email},</if>
-        <if test="mobile != null and mobile != ''">#{mobile},</if>
-        <if test="realName != null and realName != ''">#{realName},</if>
-        <if test="idCard != null and idCard != ''">#{idCard},</if>
-        <if test="avatar != null and avatar != ''">#{avatar},</if>
+        #{id}, #{createdAt}, #{createdBy}, #{updatedAt}, #{updatedBy},
+        #{userid}, #{username}, #{password},
+
+        <if test="email != null">#{email},</if>
+        <if test="mobile != null">#{mobile},</if>
+        <if test="realName != null">#{realName},</if>
+        <if test="idCard != null">#{idCard},</if>
+        <if test="avatar != null">#{avatar},</if>
+
         #{status},
         #{isDeleted}
         )

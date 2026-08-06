@@ -42,6 +42,8 @@ public class JwtUtil {
 
     /**
      * 生成 Token
+     * @param userId 用户 ID
+     * @param claims 自定义字段
      */
     public String generateToken(Long userId, Map<String, Object> claims) {
         Date now = new Date();

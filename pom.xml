@@ -121,6 +121,13 @@
             <!-- 版本号跟随你的Spring Boot BOM管理，无需手动指定 -->
         </dependency>
 
+        <!-- 测试 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope> <!-- 注意：通常放在 test 作用域 -->
+        </dependency>
+
     </dependencies>
 
     <!--  配置打包 -->
