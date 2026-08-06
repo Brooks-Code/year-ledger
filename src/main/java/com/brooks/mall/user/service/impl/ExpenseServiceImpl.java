@@ -2,10 +2,12 @@ package com.brooks.mall.user.service.impl;
 
 import com.brooks.mall.user.dto.ExpenseRecordDTO;
 import com.brooks.mall.user.entity.ExpenseRecord;
+import com.brooks.mall.user.entity.User;
 import com.brooks.mall.user.mapper.ExpenseMapper;
 import com.brooks.mall.user.service.ExpenseService;
 import com.brooks.mall.user.util.JwtUtil;
 import com.brooks.mall.user.util.SnowflakeIdGenerator;
+import com.brooks.mall.user.util.UserContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -36,6 +38,7 @@ public class ExpenseServiceImpl implements ExpenseService {
         //entity.setCreatedAt(LocalDateTime.now());
         // TODO 先写死，后面再改
         //获取创建人
+        User user = UserContext.getUser();
         entity.setCreatedBy("Brooks Cole");
         // 2. 将请求参数赋值给实体 (这里演示手动赋值，也可以用 BeanUtils)
         entity.setAmount(record.getAmount());

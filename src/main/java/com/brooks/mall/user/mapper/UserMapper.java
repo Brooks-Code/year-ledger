@@ -20,8 +20,15 @@ public interface UserMapper {
      * 根据用户名查询未删除的用户
      * 注意：SQL中显式过滤 is_deleted，这是安全底线
      */
-    @Select("SELECT * FROM orguser WHERE userid = #{userName} AND is_deleted = 0 LIMIT 1")
-    User selectByUsername(@Param("userName") String userName);
+    @Select("SELECT * FROM orguser WHERE userid = #{userId} AND is_deleted = 0 LIMIT 1")
+    User selectByUserId(@Param("userId") String userId);
+    
+    /**
+     * 根据用户名查询未删除的用户
+     * 注意：SQL中显式过滤 is_deleted，这是安全底线
+     */
+    @Select("SELECT * FROM orguser WHERE username = #{userName} AND is_deleted = 0 LIMIT 1")
+    User selectByUserName(@Param("userName") String userName);
 
     @Select("select * from orguser")
     List<User> findAll();

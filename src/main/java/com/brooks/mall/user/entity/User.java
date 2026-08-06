@@ -42,12 +42,12 @@ public class User implements Serializable {
     /**
      * 业务主键：用户ID (对应数据库字段 userid)
      */
-    private String userid;
+    private String userId;
 
     /**
      * 用户名
      */
-    private String username;
+    private String userName;
 
     /**
      * 密码

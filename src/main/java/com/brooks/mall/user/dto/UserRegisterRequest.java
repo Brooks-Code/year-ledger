@@ -10,10 +10,17 @@ import javax.validation.constraints.Size;
 public class UserRegisterRequest {
 
     /**
-     * 登录账号 (对应 userid)
+     * 登录账号 (对应 userId)
      */
     @NotBlank(message = "登录账号不能为空")
     @Size(min = 3, max = 32, message = "账号长度必须在3-32位之间")
+    private String userId;
+
+    /**
+     * 名称 (对应 userName)
+     */
+    @NotBlank(message = "登录账号不能为空")
+    @Size(min = 3, max = 32, message = "名称长度必须在3-32位之间")
     private String userName;
 
     /**

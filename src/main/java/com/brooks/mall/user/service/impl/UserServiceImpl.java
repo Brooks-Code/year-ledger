@@ -47,8 +47,11 @@ public class UserServiceImpl implements UserService {
 
         // 2. 检查唯一性 (防止并发问题或绕过前端校验)
         // 注意：这里简单演示，实际生产环境建议在数据库层面利用 UNIQUE KEY 报错来兜底
-        if (userMapper.selectByUsername(request.getUserName()) != null) {
-            throw new BusinessException("用户ID已存在");
+        if (userMapper.selectByUserId(request.getUserId()) != null) {
+            throw new BusinessException("该账号已存在");
+        }
+        if (userMapper.selectByUserName(request.getUserName()) != null) {
+            throw new BusinessException("该名称已存在");
         }
 
         // 如果邮箱/手机号也是必填且唯一的，也需要在这里检查
@@ -67,8 +70,8 @@ public class UserServiceImpl implements UserService {
         user.setCreatedBy(request.getUserName());
         user.setUpdatedAt(LocalDateTime.now());
         user.setUpdatedBy(request.getUserName());
-        user.setUserid(request.getUserName());
-        user.setUsername(request.getRealName());
+        user.setUserId(request.getUserId());
+        user.setUserName(request.getUserName());
         user.setEmail(request.getEmail());
         user.setMobile(request.getMobile());
         user.setRealName(request.getRealName());
@@ -105,7 +108,7 @@ public class UserServiceImpl implements UserService {
      */
     public LoginResponse login(LoginRequest request) {
         // 1. 查询用户
-        User user = userMapper.selectByUsername(request.getUserName());
+        User user = userMapper.selectByUserId(request.getUserId());
         if (user == null) {
             // 安全最佳实践：不提示"用户不存在"，统一提示
             throw new BusinessException("用户名或密码错误");
@@ -135,16 +138,16 @@ public class UserServiceImpl implements UserService {
 
         // 4. 生成JWT Token（建议将userid和status放入claims）
         Map<String, Object> claims = new HashMap<>(4); // 指定初始容量避免扩容
-        claims.put("userid", user.getUserid());
-        claims.put("username", user.getUsername());
+        claims.put("userid", user.getUserId());
+        claims.put("username", user.getUserName());
         claims.put("status", user.getStatus());
         String token = jwtUtil.generateToken(user.getId(), claims);
 
         // 5. 可选：更新最后登录时间/记录登录日志
         // userMapper.updateLastLogin(user.getId(), LocalDateTime.now());
 
-        log.info("用户登录成功: userid={}", user.getUserid());
-        return new LoginResponse(token, user.getUserid(), user.getUsername(), user.getStatus());
+        log.info("用户登录成功: userid={}", user.getUserId());
+        return new LoginResponse(token, user.getUserId(), user.getUserName(), user.getStatus());
     }
 
     /**
