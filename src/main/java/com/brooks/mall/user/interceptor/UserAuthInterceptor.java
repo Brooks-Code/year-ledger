@@ -43,7 +43,7 @@ public class UserAuthInterceptor implements HandlerInterceptor {
         try {
             // 3. 解析 Token 并将用户信息存入 Request
             Long userId = jwtUtil.getUserIdFromToken(token);
-            request.setAttribute("userId", userId);
+                request.setAttribute("userId", userId);
             return true;
         } catch (Exception e) {
             log.warn("JWT 认证失败: {}, URI: {}", e.getMessage(), request.getRequestURI());
