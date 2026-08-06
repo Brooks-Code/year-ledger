@@ -6,26 +6,23 @@
     <insert id="insertUser" parameterType="com.brooks.mall.user.entity.User">
         INSERT INTO orguser (
         id, created_at, created_by, updated_at, updated_by,
-        userid, username, password,
-        <!-- 可选字段加上 if 判断 -->
-        <if test="email != null">email,</if>
-        <if test="mobile != null">mobile,</if>
-        <if test="realName != null">real_name,</if>
-        <if test="idCard != null">id_card,</if>
-        <if test="avatar != null">avatar,</if>
-
+        user_id, user_name, password,
+        <!-- 可选字段：同时判断 null 和空字符串 -->
+        <if test="email != null and email.trim() != ''">email,</if>
+        <if test="mobile != null and mobile.trim() != ''">mobile,</if>
+        <if test="realName != null and realName.trim() != ''">real_name,</if>
+        <if test="idCard != null and idCard.trim() != ''">id_card,</if>
+        <if test="avatar != null and avatar.trim() != ''">avatar,</if>
         status,
         is_deleted
         ) VALUES (
         #{id}, #{createdAt}, #{createdBy}, #{updatedAt}, #{updatedBy},
-        #{userid}, #{username}, #{password},
-
-        <if test="email != null">#{email},</if>
-        <if test="mobile != null">#{mobile},</if>
-        <if test="realName != null">#{realName},</if>
-        <if test="idCard != null">#{idCard},</if>
-        <if test="avatar != null">#{avatar},</if>
-
+        #{userId}, #{userName}, #{password},
+        <if test="email != null and email.trim() != ''">#{email},</if>
+        <if test="mobile != null and mobile.trim() != ''">#{mobile},</if>
+        <if test="realName != null and realName.trim() != ''">#{realName},</if>
+        <if test="idCard != null and idCard.trim() != ''">#{idCard},</if>
+        <if test="avatar != null and avatar.trim() != ''">#{avatar},</if>
         #{status},
         #{isDeleted}
         )

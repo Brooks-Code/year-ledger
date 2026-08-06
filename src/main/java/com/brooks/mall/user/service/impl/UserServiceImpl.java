@@ -67,17 +67,16 @@ public class UserServiceImpl implements UserService {
         long id = new SnowflakeIdGenerator(1, 1).nextId();
         user.setId(id);
         user.setCreatedAt(LocalDateTime.now());
-        user.setCreatedBy(request.getUserName());
+        user.setCreatedBy(request.getUserId());
         user.setUpdatedAt(LocalDateTime.now());
-        user.setUpdatedBy(request.getUserName());
+        user.setUpdatedBy(request.getUserId());
         user.setUserId(request.getUserId());
         user.setUserName(request.getUserName());
         user.setEmail(request.getEmail());
         user.setMobile(request.getMobile());
         user.setRealName(request.getRealName());
         user.setIdCard(request.getIdCard());
-        user.setAvatar(request.getAvatar());
-        // 设置默认头像
+        // 头像
         //user.setAvatar("");
 
         // 【核心】BCrypt 加密
