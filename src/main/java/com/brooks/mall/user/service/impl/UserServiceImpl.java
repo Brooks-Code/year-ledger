@@ -74,7 +74,8 @@ public class UserServiceImpl implements UserService {
         user.setRealName(request.getRealName());
         user.setIdCard(request.getIdCard());
         user.setAvatar(request.getAvatar());
-        user.setAvatar("http://11");
+        // 设置默认头像
+        //user.setAvatar("");
 
         // 【核心】BCrypt 加密
         user.setPassword(passwordEncoder.encode(request.getPassword()));
@@ -153,5 +154,15 @@ public class UserServiceImpl implements UserService {
     public List<User> getUsers() {
         // 调用 Mapper 里的查询方法
        return userMapper.findAll();
+    }
+
+    /**
+     * 根据id查询用户
+     *
+     * @param id
+     */
+    @Override
+    public User getUser(Long id) {
+        return userMapper.getUser(id);
     }
 }

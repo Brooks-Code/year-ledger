@@ -4,6 +4,7 @@ import com.brooks.mall.user.dto.ExpenseRecordDTO;
 import com.brooks.mall.user.entity.ExpenseRecord;
 import com.brooks.mall.user.mapper.ExpenseMapper;
 import com.brooks.mall.user.service.ExpenseService;
+import com.brooks.mall.user.util.JwtUtil;
 import com.brooks.mall.user.util.SnowflakeIdGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,8 @@ import org.springframework.stereotype.Service;
 public class ExpenseServiceImpl implements ExpenseService {
     @Autowired
     private ExpenseMapper expenseMapper;
+    @Autowired
+    private JwtUtil jwtUtil;
     /**
      * 新增账单记录
      *
@@ -31,7 +34,8 @@ public class ExpenseServiceImpl implements ExpenseService {
         long id = new SnowflakeIdGenerator(1, 1).nextId();
         entity.setId(id);
         //entity.setCreatedAt(LocalDateTime.now());
-        //TODO 先写死，后面再改
+        // TODO 先写死，后面再改
+        //获取创建人
         entity.setCreatedBy("Brooks Cole");
         // 2. 将请求参数赋值给实体 (这里演示手动赋值，也可以用 BeanUtils)
         entity.setAmount(record.getAmount());

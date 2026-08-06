@@ -42,4 +42,10 @@ public interface UserMapper {
      */
     @Select("SELECT * FROM orguser WHERE mobile = #{mobile}")
     Object selectByMobile(String mobile);
+
+    /**
+     * 根据用户ID查询用户
+     */
+    @Select("SELECT * FROM orguser WHERE id = #{id}")
+    User getUser(Long id);
 }

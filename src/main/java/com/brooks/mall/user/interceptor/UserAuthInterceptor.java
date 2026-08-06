@@ -2,7 +2,10 @@ package com.brooks.mall.user.interceptor;
 
 import com.brooks.mall.common.result.Result;
 import com.brooks.mall.common.result.ResultCode;
+import com.brooks.mall.user.entity.User;
+import com.brooks.mall.user.service.UserService;
 import com.brooks.mall.user.util.JwtUtil;
+import com.brooks.mall.user.util.UserContext;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,6 +26,7 @@ public class UserAuthInterceptor implements HandlerInterceptor {
     private final JwtUtil jwtUtil;
     // ObjectMapper 是线程安全的，应作为单例注入，避免每次请求都 new 一个
     private final ObjectMapper objectMapper;
+    private UserService userService;
 
     private static final String BEARER_PREFIX = "Bearer ";
 
@@ -44,6 +48,16 @@ public class UserAuthInterceptor implements HandlerInterceptor {
             // 3. 解析 Token 并将用户信息存入 Request
             Long userId = jwtUtil.getUserIdFromToken(token);
                 request.setAttribute("userId", userId);
+
+                //将完整对象放入 ThreadLocal
+            User user = userService.getUser(userId);
+            if (user == null) {
+                // 用户不存在或已注销，拦截请求
+                response.setStatus(401);
+                return false;
+            }
+            // 4. 将完整对象放入 ThreadLocal
+            UserContext.setUser(user);
             return true;
         } catch (Exception e) {
             log.warn("JWT 认证失败: {}, URI: {}", e.getMessage(), request.getRequestURI());
