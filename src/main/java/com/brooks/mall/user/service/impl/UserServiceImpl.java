@@ -1,8 +1,8 @@
 package com.brooks.mall.user.service.impl;
 
-import com.brooks.mall.user.dto.LoginRequest;
-import com.brooks.mall.user.dto.LoginResponse;
-import com.brooks.mall.user.dto.UserRegisterRequest;
+import com.brooks.mall.user.dto.request.LoginRequest;
+import com.brooks.mall.user.dto.response.LoginResponse;
+import com.brooks.mall.user.dto.request.RegisterRequest;
 import com.brooks.mall.user.entity.User;
 import com.brooks.mall.user.exception.BusinessException;
 import com.brooks.mall.user.mapper.UserMapper;
@@ -39,7 +39,7 @@ public class UserServiceImpl implements UserService {
 
 
     @Override
-    public void register(UserRegisterRequest request) {
+    public void register(RegisterRequest request) {
         // 1. 二次校验密码一致性
         if (!request.getPassword().equals(request.getConfirmPassword())) {
             throw new BusinessException("两次输入的密码不一致");

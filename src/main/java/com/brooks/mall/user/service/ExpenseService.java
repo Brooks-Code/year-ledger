@@ -1,6 +1,6 @@
 package com.brooks.mall.user.service;
 
-import com.brooks.mall.user.dto.ExpenseRecordDTO;
+import com.brooks.mall.user.dto.request.ExpenseRecordRequest;
 
 /**
  * TODO
@@ -15,5 +15,5 @@ public interface ExpenseService {
      * @param record
      * @return
      */
-    boolean save(ExpenseRecordDTO record);
+    boolean save(ExpenseRecordRequest record);
 }

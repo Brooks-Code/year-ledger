@@ -2,7 +2,7 @@ package com.brooks.mall.user.controller;
 
 import com.brooks.mall.common.result.Result;
 import com.brooks.mall.common.result.ResultCode;
-import com.brooks.mall.user.dto.ExpenseRecordDTO;
+import com.brooks.mall.user.dto.request.ExpenseRecordRequest;
 import com.brooks.mall.user.service.ExpenseService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -27,7 +27,7 @@ public class ExpenseController {
      * 对应前端: axios.post('/api/expense-record', form)
      */
     @PostMapping("/expense-record")
-    public Result saveExpense(@RequestBody ExpenseRecordDTO record) {
+    public Result saveExpense(@RequestBody ExpenseRecordRequest record) {
         // 调用 service 层保存到数据库
         boolean success = expenseService.save(record);
 

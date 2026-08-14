@@ -1,6 +1,6 @@
 package com.brooks.mall.user.service.impl;
 
-import com.brooks.mall.user.dto.ExpenseRecordDTO;
+import com.brooks.mall.user.dto.request.ExpenseRecordRequest;
 import com.brooks.mall.user.entity.ExpenseRecord;
 import com.brooks.mall.user.entity.User;
 import com.brooks.mall.user.mapper.ExpenseMapper;
@@ -30,7 +30,7 @@ public class ExpenseServiceImpl implements ExpenseService {
      * @return
      */
     @Override
-    public boolean save(ExpenseRecordDTO record) {
+    public boolean save(ExpenseRecordRequest record) {
         // 1. 实例化数据库实体对象
         ExpenseRecord entity = new ExpenseRecord();
         long id = new SnowflakeIdGenerator(1, 1).nextId();

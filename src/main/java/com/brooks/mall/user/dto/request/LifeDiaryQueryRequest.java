@@ -1,4 +1,4 @@
-package com.brooks.mall.user.dto;
+package com.brooks.mall.user.dto.request;
 
 import lombok.Data;
 import java.time.LocalDate;
@@ -7,7 +7,7 @@ import java.time.LocalDate;
  * 日记查询请求 DTO
  */
 @Data
-public class LifeDiaryQueryDTO {
+public class LifeDiaryQueryRequest {
 
     /**
      * 页码（默认第1页）

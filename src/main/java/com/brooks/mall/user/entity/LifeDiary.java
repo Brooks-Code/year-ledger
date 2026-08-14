@@ -42,7 +42,7 @@ public class LifeDiary implements Serializable {
 
     /**
      * 日记日期
-     * ⚠️ 注意：数据库是 date 类型，Java 推荐用 LocalDate
+     * 注意：数据库是 date 类型，Java 推荐用 LocalDate
      */
     private LocalDate diaryDate;
 

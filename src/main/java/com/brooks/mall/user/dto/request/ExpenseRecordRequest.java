@@ -1,4 +1,4 @@
-package com.brooks.mall.user.dto;
+package com.brooks.mall.user.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
  * 对应前端"记一笔日常花销"表单
  */
 @Data
-public class ExpenseRecordDTO {
+public class ExpenseRecordRequest {
 
     /**
      * 花销金额

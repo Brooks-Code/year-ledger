@@ -24,7 +24,7 @@ public class GadgetUtil {
         int input = scanner.nextInt();
         int output = scanner.nextInt();
         int a = input + output;
-        System.out.print("执行结果："+ a);
+        System.out.print("执行结果：" + a);
         // 关闭 Scanner
         scanner.close();
     }

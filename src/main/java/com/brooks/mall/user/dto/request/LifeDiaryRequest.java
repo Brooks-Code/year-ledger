@@ -1,4 +1,4 @@
-package com.brooks.mall.user.dto;
+package com.brooks.mall.user.dto.request;
 
 import lombok.Data;
 import javax.validation.constraints.NotBlank;
@@ -9,7 +9,7 @@ import java.time.LocalDate;
  * 日记创建/修改请求 DTO
  */
 @Data
-public class LifeDiaryDTO {
+public class LifeDiaryRequest {
 
     /**
      * 主键ID（更新时必传，新增时不传）

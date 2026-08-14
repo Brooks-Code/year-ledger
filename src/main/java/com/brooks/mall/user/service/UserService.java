@@ -1,8 +1,8 @@
 package com.brooks.mall.user.service;
 
-import com.brooks.mall.user.dto.LoginRequest;
-import com.brooks.mall.user.dto.LoginResponse;
-import com.brooks.mall.user.dto.UserRegisterRequest;
+import com.brooks.mall.user.dto.request.LoginRequest;
+import com.brooks.mall.user.dto.response.LoginResponse;
+import com.brooks.mall.user.dto.request.RegisterRequest;
 import com.brooks.mall.user.entity.User;
 
 import java.util.List;
@@ -17,7 +17,7 @@ public interface UserService {
     /**
      * 新增：用户注册接口
      */
-    void register(UserRegisterRequest request);
+    void register(RegisterRequest request);
     /**
      * 登录
      *

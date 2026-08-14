@@ -1,4 +1,4 @@
-package com.brooks.mall.user.dto;
+package com.brooks.mall.user.dto.request;
 
 import lombok.Data;
 
@@ -7,7 +7,7 @@ import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
 @Data
-public class UserRegisterRequest {
+public class RegisterRequest {
 
     /**
      * 登录账号 (对应 userId)
