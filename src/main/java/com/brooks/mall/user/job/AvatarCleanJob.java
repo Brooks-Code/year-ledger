@@ -1,5 +1,6 @@
 package com.brooks.mall.user.job;
 
+import com.brooks.mall.user.config.FileUploadConfig;
 import com.brooks.mall.user.entity.User;
 import com.brooks.mall.user.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +17,8 @@ import java.util.stream.Collectors;
 @Component
 @RequiredArgsConstructor
 public class AvatarCleanJob {
+
+    private final FileUploadConfig fileUploadConfig;
 
     private final UserService userService;
     // 这里填入你配置文件中头像存储的绝对路径，或者注入你的 FileUploadConfig
@@ -40,6 +43,7 @@ public class AvatarCleanJob {
                     .collect(Collectors.toSet());
 
             // 2. 扫描本地磁盘的头像文件夹
+            String uploadPath = fileUploadConfig.getUploadPath();
             File dir = new File(uploadPath);
             if (!dir.exists() || !dir.isDirectory()) {
                 log.warn("头像目录不存在: {}", uploadPath);

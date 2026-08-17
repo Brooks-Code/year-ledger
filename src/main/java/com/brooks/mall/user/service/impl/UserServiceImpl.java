@@ -40,8 +40,7 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private UserMapper userMapper;
-    @Autowired
-    private FileUploadConfig fileUploadConfig;
+    private final FileUploadConfig fileUploadConfig;
     private final JwtUtil jwtUtil;
     private final PasswordEncoder passwordEncoder;
 
@@ -167,7 +166,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<User> getUsers() {
         // 调用 Mapper 里的查询方法
-        return userMapper.getUsers();
+        return userMapper.getUsers ();
     }
 
     /**
