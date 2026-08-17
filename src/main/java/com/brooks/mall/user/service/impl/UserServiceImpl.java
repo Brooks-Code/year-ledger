@@ -180,7 +180,7 @@ public class UserServiceImpl implements UserService {
     }
 
     /**
-     * 处理头像上传业务
+     * 处理头像上传业务 -- 作废
      *
      * @param file 前端传来的文件
      * @return 图片的访问 URL
@@ -212,7 +212,7 @@ public class UserServiceImpl implements UserService {
         } catch (IOException e) {
             throw new BusinessException("文件写入失败:" + e);
         }
-        // 【新增】图片上传成功后，将图片访问路径保存到数据库中
+        // 图片上传成功后，将图片访问路径保存到数据库中
         User user = UserContext.getUser();
         userMapper.updateAvatar(user.getUserId(), fileUploadConfig.getAccessPrefix() + newFileName);
 

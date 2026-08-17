@@ -37,7 +37,7 @@ public interface UserService {
     User getUser(Long id);
 
     /**
-     * 处理头像上传业务
+     * 处理本地头像上传业务 --作废
      * @param file 前端传来的文件
      * @return 图片的访问 URL
      */

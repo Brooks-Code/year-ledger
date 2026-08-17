@@ -25,7 +25,7 @@ public class UserController {
     private UserService userService;
 
     /**
-     * 处理头像上传业务
+     * 处理头像上传业务 -- 作废
      *
      * @param file 前端传来的文件
      * @return 图片的访问 URL
