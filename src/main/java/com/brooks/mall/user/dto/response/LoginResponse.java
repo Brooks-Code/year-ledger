@@ -14,5 +14,6 @@ public class LoginResponse implements Serializable {
     private String token;      // JWT Token
     private String userid;     // 业务用户ID
     private String username;
+    private String avatarUrl;
     private Integer status;
 }

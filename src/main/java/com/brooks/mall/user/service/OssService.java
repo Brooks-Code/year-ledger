@@ -16,4 +16,9 @@ public interface OssService {
      * @return 图片的访问 URL
      */
     String uploadAvatar(MultipartFile file);
+
+    /**
+     * 删除文件
+     */
+    void deleteFile(String fileName);
 }

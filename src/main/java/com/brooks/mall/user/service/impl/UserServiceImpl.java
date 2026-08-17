@@ -157,7 +157,7 @@ public class UserServiceImpl implements UserService {
         // userMapper.updateLastLogin(user.getId(), LocalDateTime.now());
 
         log.info("用户登录成功: userid={}", user.getUserId());
-        return new LoginResponse(token, user.getUserId(), user.getUserName(), user.getStatus());
+        return new LoginResponse(token, user.getUserId(), user.getUserName(),user.getAvatar(), user.getStatus());
     }
 
     /**

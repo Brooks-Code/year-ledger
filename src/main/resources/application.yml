@@ -51,5 +51,5 @@ aliyun:
     # Bucket 所在地域节点
     endpoint: oss-cn-beijing.aliyuncs.com
     access-key-id: ${OSS_ACCESS_KEY_ID}
-    access-key-secret: KuOFadesAQvCoJuonCLBTMvqFPO4Vu
-    bucket-name: your-bucket-name           # 替换为你的 Bucket 名称
+    access-key-secret: ${OSS_ACCESS_KEY_SECRET}
+    bucket-name: year-ledger
