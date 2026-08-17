@@ -1,25 +1,31 @@
 package com.brooks.mall.user.service.impl;
 
+import com.brooks.mall.user.config.FileUploadConfig;
 import com.brooks.mall.user.dto.request.LoginRequest;
-import com.brooks.mall.user.dto.response.LoginResponse;
 import com.brooks.mall.user.dto.request.RegisterRequest;
+import com.brooks.mall.user.dto.response.LoginResponse;
 import com.brooks.mall.user.entity.User;
 import com.brooks.mall.user.exception.BusinessException;
 import com.brooks.mall.user.mapper.UserMapper;
 import com.brooks.mall.user.service.UserService;
 import com.brooks.mall.user.util.JwtUtil;
 import com.brooks.mall.user.util.SnowflakeIdGenerator;
+import com.brooks.mall.user.util.UserContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * TODO
@@ -34,10 +40,16 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private UserMapper userMapper;
+    @Autowired
+    private FileUploadConfig fileUploadConfig;
     private final JwtUtil jwtUtil;
     private final PasswordEncoder passwordEncoder;
 
-
+    /**
+     * 注册
+     *
+     * @param request 注册请求参数
+     */
     @Override
     public void register(RegisterRequest request) {
         // 1. 二次校验密码一致性
@@ -55,12 +67,12 @@ public class UserServiceImpl implements UserService {
         }
 
         // 如果邮箱/手机号也是必填且唯一的，也需要在这里检查
-         if (StringUtils.hasText(request.getEmail()) && userMapper.selectByEmail(request.getEmail()) != null){
-             throw new BusinessException("邮箱已存在");
-         }
-         if (StringUtils.hasText(request.getMobile()) && userMapper.selectByMobile(request.getMobile()) != null){
-             throw new BusinessException("手机号已存在");
-         }
+        if (StringUtils.hasText(request.getEmail()) && userMapper.selectByEmail(request.getEmail()) != null) {
+            throw new BusinessException("邮箱已存在");
+        }
+        if (StringUtils.hasText(request.getMobile()) && userMapper.selectByMobile(request.getMobile()) != null) {
+            throw new BusinessException("手机号已存在");
+        }
 
         // 3. 构建实体对象
         User user = new User();
@@ -155,7 +167,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<User> getUsers() {
         // 调用 Mapper 里的查询方法
-       return userMapper.findAll();
+        return userMapper.getUsers();
     }
 
     /**
@@ -166,5 +178,47 @@ public class UserServiceImpl implements UserService {
     @Override
     public User getUser(Long id) {
         return userMapper.getUser(id);
+    }
+
+    /**
+     * 处理头像上传业务
+     *
+     * @param file 前端传来的文件
+     * @return 图片的访问 URL
+     */
+    @Override
+    public String uploadAvatar(MultipartFile file) {
+        // 1. 获取配置的存储路径
+        String basePath = fileUploadConfig.getUploadPath();
+
+        // 2. 确保存储目录存在，不存在则创建
+        File dir = new File(basePath);
+        if (!dir.exists()) {
+            dir.mkdirs();
+        }
+
+        // 3. 生成唯一文件名 (防止文件名重复覆盖)
+        // 获取原始后缀名，例如 .jpg, .png
+        String originalFilename = file.getOriginalFilename();
+        String suffix = originalFilename.substring(originalFilename.lastIndexOf("."));
+        // 新文件名 = UUID + 后缀
+        String newFileName = UUID.randomUUID().toString() + suffix;
+
+        // 4. 构建完整的文件保存路径
+        File dest = new File(basePath + newFileName);
+
+        // 5. 将文件写入磁盘
+        try {
+            file.transferTo(dest);
+        } catch (IOException e) {
+            throw new BusinessException("文件写入失败:" + e);
+        }
+        // 【新增】图片上传成功后，将图片访问路径保存到数据库中
+        User user = UserContext.getUser();
+        userMapper.updateAvatar(user.getUserId(), fileUploadConfig.getAccessPrefix() + newFileName);
+
+        // 6. 返回访问路径 (前缀 + 文件名)
+        // 例如: /api/images/a1b2c3d4.jpg
+        return fileUploadConfig.getAccessPrefix() + newFileName;
     }
 }

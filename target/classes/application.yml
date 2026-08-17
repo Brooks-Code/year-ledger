@@ -32,3 +32,10 @@ zhipu:
 # JWT 密钥配置
 jwt:
   secret: jPhHbslSkahOWlrLV0igAoekBVagWmFwi4RR4PZxdNw=
+
+# 文件上传配置
+file:
+  upload:
+    path: D:/ActionSoft/workspace/code/year-ledger/uploads/avatars/
+    # 访问前缀保持不变
+    access-prefix: /api/images/

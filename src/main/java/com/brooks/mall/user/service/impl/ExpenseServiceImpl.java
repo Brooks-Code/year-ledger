@@ -5,7 +5,6 @@ import com.brooks.mall.user.entity.ExpenseRecord;
 import com.brooks.mall.user.entity.User;
 import com.brooks.mall.user.mapper.ExpenseMapper;
 import com.brooks.mall.user.service.ExpenseService;
-import com.brooks.mall.user.util.JwtUtil;
 import com.brooks.mall.user.util.SnowflakeIdGenerator;
 import com.brooks.mall.user.util.UserContext;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,8 +20,6 @@ import org.springframework.stereotype.Service;
 public class ExpenseServiceImpl implements ExpenseService {
     @Autowired
     private ExpenseMapper expenseMapper;
-    @Autowired
-    private JwtUtil jwtUtil;
     /**
      * 新增账单记录
      *

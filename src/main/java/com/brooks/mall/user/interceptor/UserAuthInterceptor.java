@@ -9,6 +9,7 @@ import com.brooks.mall.user.util.UserContext;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -26,6 +27,7 @@ public class UserAuthInterceptor implements HandlerInterceptor {
     private final JwtUtil jwtUtil;
     // ObjectMapper 是线程安全的，应作为单例注入，避免每次请求都 new 一个
     private final ObjectMapper objectMapper;
+    @Autowired
     private UserService userService;
 
     private static final String BEARER_PREFIX = "Bearer ";

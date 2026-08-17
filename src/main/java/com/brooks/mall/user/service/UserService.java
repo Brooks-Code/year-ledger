@@ -1,9 +1,10 @@
 package com.brooks.mall.user.service;
 
 import com.brooks.mall.user.dto.request.LoginRequest;
-import com.brooks.mall.user.dto.response.LoginResponse;
 import com.brooks.mall.user.dto.request.RegisterRequest;
+import com.brooks.mall.user.dto.response.LoginResponse;
 import com.brooks.mall.user.entity.User;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -34,4 +35,11 @@ public interface UserService {
      * 根据id查询用户
      */
     User getUser(Long id);
+
+    /**
+     * 处理头像上传业务
+     * @param file 前端传来的文件
+     * @return 图片的访问 URL
+     */
+    String uploadAvatar(MultipartFile file);
 }

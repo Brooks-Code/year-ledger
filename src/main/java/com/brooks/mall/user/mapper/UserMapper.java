@@ -31,7 +31,7 @@ public interface UserMapper {
     User selectByUserName(@Param("userName") String userName);
 
     @Select("select * from orguser")
-    List<User> findAll();
+    List<User> getUsers();
 
     /**
      * 新增用户
@@ -55,4 +55,10 @@ public interface UserMapper {
      */
     @Select("SELECT * FROM orguser WHERE id = #{id}")
     User getUser(Long id);
+
+    /**
+     * 更新用户头像
+     */
+    @Select("UPDATE orguser SET avatar = #{avatar} WHERE user_id = #{userId}")
+    void updateAvatar(String userId, String avatar);
 }
