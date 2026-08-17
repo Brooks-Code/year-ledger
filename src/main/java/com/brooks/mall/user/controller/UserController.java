@@ -44,7 +44,7 @@ public class UserController {
 
         } catch (Exception e) {
             e.printStackTrace();
-            return Result.fail(500, "上传失败：" + e.getMessage());
+            return Result.fail(500, "上传失败");
         }
         return Result.success(map);
     }

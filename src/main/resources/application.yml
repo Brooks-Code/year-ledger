@@ -5,6 +5,11 @@ spring:
     username: root
     password: 1234
     driver-class-name: com.mysql.jdbc.Driver
+  # 上传文件大小限制
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 25MB
 
 # MyBatis 配置
 mybatis:
