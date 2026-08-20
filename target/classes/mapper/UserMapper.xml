@@ -27,4 +27,35 @@
         #{isDeleted}
         )
     </insert>
+    <!-- 修改用户信息 -->
+    <update id="updateUser" parameterType="com.brooks.mall.user.entity.User">
+        UPDATE orguser
+        <set>
+            <!-- 字符串类型增加 != '' 判断，防止空字符串覆盖有效数据 -->
+            <if test="userName != null and userName != ''">
+                user_name = #{userName},
+            </if>
+            <if test="password != null and password != ''">
+                password = #{password},
+            </if>
+            <if test="email != null and email != ''">
+                email = #{email},
+            </if>
+            <if test="mobile != null and mobile != ''">
+                mobile = #{mobile},
+            </if>
+            <if test="realName != null and realName != ''">
+                real_name = #{realName},
+            </if>
+            <if test="avatar != null and avatar != ''">
+                avatar = #{avatar},
+            </if>
+            <!-- status 为数值类型，只需判断 != null，以支持将状态更新为 0（禁用） -->
+            <if test="status != null">
+                status = #{status},
+            </if>
+        </set>
+        <!-- 增加 is_deleted = 0 条件，防止更新已被逻辑删除的数据 -->
+        WHERE id = #{id} AND is_deleted = 0
+    </update>
 </mapper>

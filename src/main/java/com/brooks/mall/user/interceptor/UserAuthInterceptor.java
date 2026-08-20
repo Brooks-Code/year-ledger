@@ -7,6 +7,8 @@ import com.brooks.mall.user.service.UserService;
 import com.brooks.mall.user.util.JwtUtil;
 import com.brooks.mall.user.util.UserContext;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,11 +63,20 @@ public class UserAuthInterceptor implements HandlerInterceptor {
             // 4. 将完整对象放入 ThreadLocal
             UserContext.setUser(user);
             return true;
-        } catch (Exception e) {
-            log.warn("JWT 认证失败: {}, URI: {}", e.getMessage(), request.getRequestURI());
+        } catch (ExpiredJwtException e) {
+            log.warn("Token 已过期: {}, URI: {}", e.getMessage(), request.getRequestURI());
+            renderJson(response, Result.fail(ResultCode.TOKEN_EXPIRED));
+            return false;
+        } catch (JwtException e) {
+            log.warn("JWT 格式或签名错误: {}, URI: {}", e.getMessage(), request.getRequestURI());
             renderJson(response, Result.fail(ResultCode.UNAUTHORIZED));
             return false;
         }
+    }
+    @Override
+    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) {
+        // 请求结束后清理 ThreadLocal
+        UserContext.clear();
     }
 
     /**

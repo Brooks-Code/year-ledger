@@ -33,16 +33,16 @@ public class ExpenseServiceImpl implements ExpenseService {
         long id = new SnowflakeIdGenerator(1, 1).nextId();
         entity.setId(id);
         //entity.setCreatedAt(LocalDateTime.now());
-        // TODO 先写死，后面再改
         //获取创建人
         User user = UserContext.getUser();
-        entity.setCreatedBy("Brooks Cole");
+        entity.setCreatedBy(user.getRealName());
         // 2. 将请求参数赋值给实体 (这里演示手动赋值，也可以用 BeanUtils)
         entity.setAmount(record.getAmount());
         entity.setCategory(record.getCategory());
         entity.setExpenseDate(record.getExpenseDate());
         entity.setPaymentMethod(record.getPaymentMethod());
         entity.setRemark(record.getRemark());
+        entity.setOrgUserId(user.getId());
         // 调用 DAO 层保存到数据库
         int rows = expenseMapper.insert(entity);
         // 根据受影响行数判断是否成功

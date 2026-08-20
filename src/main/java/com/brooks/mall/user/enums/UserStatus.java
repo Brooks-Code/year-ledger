@@ -8,8 +8,11 @@ package com.brooks.mall.user.enums;
  * @Date 2026/7/31 14:30
  */
 public enum UserStatus {
+    // 禁用
     DISABLED(0),
+    // 启用
     ACTIVE(1),
+    // 未激活
     INACTIVE(2);
 
     private final int code;

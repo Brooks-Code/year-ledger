@@ -20,8 +20,8 @@ public class JwtUtil {
     // 密钥
     @Value("${jwt.secret}")
     private String secret;
-    // Token 过期时间 默认 1 天
-    @Value("${jwt.expiration:86400000}")
+    // Token 过期时间 默认 1 天（86400000）
+    @Value("${jwt.expiration}")
     private long expiration;
 
     /**
@@ -48,7 +48,6 @@ public class JwtUtil {
     public String generateToken(Long userId, Map<String, Object> claims) {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + expiration);
-
         return Jwts.builder()
                 .subject(String.valueOf(userId)) // 标准字段存 ID
                 .claims(claims)                  // 自定义字段

@@ -4,6 +4,7 @@ import com.brooks.mall.user.entity.User;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 
 import java.util.List;
 
@@ -59,6 +60,17 @@ public interface UserMapper {
     /**
      * 更新用户头像
      */
-    @Select("UPDATE orguser SET avatar = #{avatar} WHERE user_id = #{userId}")
+    @Update("UPDATE orguser SET avatar = #{avatar} WHERE user_id = #{userId}")
     void updateAvatar(String userId, String avatar);
+
+    /**
+     * 更新用户信息
+     */
+    void updateUser(User user);
+
+    /**
+     * 修改密码
+     */
+    @Update("UPDATE orguser SET password = #{password} WHERE id = #{id}")
+    void updatePassword(@Param("id") Long id, @Param("password") String encodePassword);
 }

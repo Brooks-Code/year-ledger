@@ -1,6 +1,7 @@
 package com.brooks.mall.user.service.impl;
 
 import com.brooks.mall.user.config.FileUploadConfig;
+import com.brooks.mall.user.dto.request.ChangePasswordRequest;
 import com.brooks.mall.user.dto.request.LoginRequest;
 import com.brooks.mall.user.dto.request.RegisterRequest;
 import com.brooks.mall.user.dto.response.LoginResponse;
@@ -187,6 +188,10 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public String uploadAvatar(MultipartFile file) {
+        // 1. 基础校验
+        if (file.isEmpty()) {
+            throw new BusinessException("上传文件不能为空");
+        }
         // 1. 获取配置的存储路径
         String basePath = fileUploadConfig.getUploadPath();
 
@@ -219,5 +224,30 @@ public class UserServiceImpl implements UserService {
         // 6. 返回访问路径 (前缀 + 文件名)
         // 例如: /api/images/a1b2c3d4.jpg
         return fileUploadConfig.getAccessPrefix() + newFileName;
+    }
+
+    /**
+     * 修改密码
+     *
+     * @param request
+     * @return
+     */
+    @Override
+    public void updatePassword(ChangePasswordRequest request) {
+        String oldPassword = request.getOldPassword();
+        String newPassword = request.getNewPassword();
+        String confirmPassword = request.getConfirmPassword();
+        if (!newPassword.equals(confirmPassword)) {
+            throw new BusinessException("新密码和确认密码不一致");
+        }
+        User user = UserContext.getUser();
+        // 3. 校验密码（使用BCrypt等单向加密比对）
+        if (!passwordEncoder.matches(request.getOldPassword(), user.getPassword())) {
+            throw new BusinessException("旧密码错误");
+        }
+        String encodePassword = passwordEncoder.encode(newPassword);
+        user.setPassword(encodePassword);
+        userMapper.updatePassword(user.getId(),encodePassword);
+        log.info("修改密码成功: userid={}", user.getUserId());
     }
 }

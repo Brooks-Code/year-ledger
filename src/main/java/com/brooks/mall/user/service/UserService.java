@@ -1,5 +1,6 @@
 package com.brooks.mall.user.service;
 
+import com.brooks.mall.user.dto.request.ChangePasswordRequest;
 import com.brooks.mall.user.dto.request.LoginRequest;
 import com.brooks.mall.user.dto.request.RegisterRequest;
 import com.brooks.mall.user.dto.response.LoginResponse;
@@ -42,4 +43,11 @@ public interface UserService {
      * @return 图片的访问 URL
      */
     String uploadAvatar(MultipartFile file);
+
+    /**
+     * 修改密码
+     * @param request
+     * @return
+     */
+    void updatePassword(ChangePasswordRequest request);
 }

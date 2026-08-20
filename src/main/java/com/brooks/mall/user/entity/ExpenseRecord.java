@@ -57,5 +57,10 @@ public class ExpenseRecord implements Serializable {
      */
     private String paymentMethod;
 
+    /**
+     * 用户 ID
+     */
+    private Long orgUserId;
+
 
 }

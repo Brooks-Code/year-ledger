@@ -1,6 +1,7 @@
 package com.brooks.mall.user.controller;
 
 import com.brooks.mall.common.result.Result;
+import com.brooks.mall.user.dto.request.ChangePasswordRequest;
 import com.brooks.mall.user.entity.User;
 import com.brooks.mall.user.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,14 +35,9 @@ public class UserController {
     public Result<Map> updateAvatar(@RequestParam("file") MultipartFile file) {
         HashMap<String, Object> map = new HashMap<>();
         try {
-            // 1. 基础校验
-            if (file.isEmpty()) {
-                return Result.fail(500, "上传文件不能为空");
-            }
             // 2. 调用 Service 层处理上传逻辑
             String avatarUrl = userService.uploadAvatar(file);
             map.put("avatarUrl", avatarUrl);
-
         } catch (Exception e) {
             e.printStackTrace();
             return Result.fail(500, "上传失败");
@@ -55,4 +51,12 @@ public class UserController {
         return userService.getUsers();
     }
 
+    /**
+     * 修改密码
+     */
+    @PostMapping("/update/password")
+    public Result updatePassword(@RequestBody ChangePasswordRequest request) {
+        userService.updatePassword(request);
+        return Result.success("修改密码成功");
+    }
 }

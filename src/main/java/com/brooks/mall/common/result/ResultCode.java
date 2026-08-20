@@ -10,10 +10,12 @@ public enum ResultCode {
 
     SUCCESS(200, "操作成功"),
     BAD_REQUEST(400, "请求参数错误: %s"),
-    UNAUTHORIZED(401, "未认证或凭证已过期"),
+    TOKEN_EXPIRED(401, "凭证已过期"),
+    UNAUTHORIZED(402, "凭证错误"),
     FORBIDDEN(403, "无权访问该资源"),
     NOT_FOUND(404, "请求的资源不存在"),
     INTERNAL_ERROR(500, "系统内部异常");
+
 
     private final int code;
     private final String messageTemplate;
