@@ -32,7 +32,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
                 );
     }
 
-    // 配置静态资源映射，让前端能访问到图片
+    // 配置静态资源映射，让前端能访问到图片 -- 映射到实际路径
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         String prefix = fileUploadConfig.getAccessPrefix();

@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>拼豆图纸生成器</title>
+    <style>
+        /* 全局与容器样式 */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f6f8;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            text-align: center;
+        }
+
+        h2 {
+            margin-bottom: 25px;
+            color: #2c3e50;
+        }
+
+        /* 控制区样式 */
+        .controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 25px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+        }
+
+        .upload-label {
+            padding: 10px 20px;
+            background: #fff;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .upload-label:hover {
+            background: #eee;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        .input-group {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        input[type="number"] {
+            padding: 8px;
+            width: 60px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            text-align: center;
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.2s;
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-primary {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background-color: #45a049;
+        }
+
+        .btn-export {
+            background-color: #2196F3;
+            color: white;
+        }
+
+        .btn-export:hover:not(:disabled) {
+            background-color: #1e88e5;
+        }
+
+        /* Canvas 画布样式 */
+        canvas {
+            max-width: 100%;
+            height: auto;
+            border: 1px solid #ddd;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            margin-bottom: 20px;
+            background: #fff; /* 确保背景是白色的 */
+        }
+
+        /* 统计清单样式 (对应截图红框部分) */
+        .stats-box {
+            margin-top: 20px;
+            padding: 20px;
+            background: #fff;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            text-align: left;
+        }
+
+        .stats-title {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 5px;
+        }
+
+        .stats-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            background: #f9f9f9;
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+
+        .color-swatch {
+            display: inline-block;
+            width: 14px;
+            height: 14px;
+            margin-right: 6px;
+            border: 1px solid rgba(0, 0, 0, 0.2); /* 给浅色加个边框 */
+            border-radius: 2px;
+        }
+    </style>
+</head>
+
+<body>
+<div class="container">
+    <h2>🎨 拼豆图纸生成器</h2>
+    <!-- 控制面板 -->
+    <div class="controls">
+        <label for="fileInput" class="upload-label">📁 选择图片</label>
+        <input type="file" id="fileInput" accept="image/*">
+        <div class="input-group">
+            <label>网格大小:</label>
+            <input type="number" id="gridSize" value="48" min="10" max="100">
+        </div>
+        <button class="btn-primary" id="generateBtn" disabled>生成图纸</button>
+        <button class="btn-export" id="exportBtn" disabled>💾 导出 PNG</button>
+    </div>
+    <!-- 画布区域：生成的图纸会显示在这里 -->
+    <canvas id="patternCanvas"></canvas>
+    <!-- 统计区域：显示色号清单和数量 -->
+    <div id="stats" class="stats"></div>
+</div>
+</body>
+<script>
+    // 拼豆色卡定义 (色号: [R, G, B])
+    // 你可以根据实际购买的豆子品牌修改这里的颜色值
+    const COLOR_PALETTE = {
+        "H02": [100, 100, 100],
+        "A03": [200, 200, 200],
+        "E03": [100, 150, 255],
+        "H01": [0, 0, 0],
+        "G01": [139, 69, 19],
+        "D03": [150, 220, 150],
+        "F02": [200, 100, 200],
+        "F01": [128, 0, 128],
+        "B03": [255, 100, 100],
+        "B02": [200, 0, 0],
+        "D01": [0, 180, 0],
+        "A02": [240, 240, 240]
+    };
+
+    const fileInput = document.getElementById('fileInput');
+    const generateBtn = document.getElementById('generateBtn');
+    const exportBtn = document.getElementById('exportBtn');
+    const canvas = document.getElementById('patternCanvas');
+    const ctx = canvas.getContext('2d');
+    const statsDiv = document.getElementById('stats');
+    const gridSizeInput = document.getElementById('gridSize');
+
+    let currentImage = null;
+
+    // 1. 监听图片上传
+    fileInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            const img = new Image();
+            img.onload = () => {
+                currentImage = img;
+                generateBtn.disabled = false;
+                // 重置状态
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                statsDiv.innerHTML = '';
+                exportBtn.disabled = true;
+            };
+            img.src = event.target.result;
+        };
+        reader.readAsDataURL(file);
+    });
+
+    // 2. 核心算法：寻找最接近的颜色
+    // --- 颜色空间转换辅助函数 ---
+    // 将 RGB 转换为 CIELAB 色彩空间
+    function rgbToLab(r, g, b) {
+        // 1. RGB 转 XYZ
+        r /= 255;
+        g /= 255;
+        b /= 255;
+        r = r > 0.04045 ? Math.pow((r + 0.055) / 1.055, 2.4) : r / 12.92;
+        g = g > 0.04045 ? Math.pow((g + 0.055) / 1.055, 2.4) : g / 12.92;
+        b = b > 0.04045 ? Math.pow((b + 0.055) / 1.055, 2.4) : b / 12.92;
+
+        r *= 100;
+        g *= 100;
+        b *= 100;
+        let x = r * 0.4124 + g * 0.3576 + b * 0.1805;
+        let y = r * 0.2126 + g * 0.7152 + b * 0.0722;
+        let z = r * 0.0193 + g * 0.1192 + b * 0.9505;
+
+        // 2. XYZ 转 Lab
+        x /= 95.047;
+        y /= 100.0;
+        z /= 108.883;
+        x = x > 0.008856 ? Math.pow(x, 1 / 3) : (7.787 * x) + 16 / 116;
+        y = y > 0.008856 ? Math.pow(y, 1 / 3) : (7.787 * y) + 16 / 116;
+        z = z > 0.008856 ? Math.pow(z, 1 / 3) : (7.787 * z) + 16 / 116;
+
+        return [
+            (116 * y) - 16, // L
+            500 * (x - y),  // a
+            200 * (y - z)   // b
+        ];
+    }
+
+    // --- 核心匹配算法 ---
+    function getClosestColor(r, g, b) {
+        let minDist = Infinity;
+        let closestCode = '???';
+        let closestRgb = [0, 0, 0];
+
+        // 将目标像素转换为 Lab 空间
+        const [labL, labA, labB] = rgbToLab(r, g, b);
+
+        for (const [code, rgb] of Object.entries(COLOR_PALETTE)) {
+            // 将色卡颜色也转换为 Lab 空间
+            const [pL, pA, pB] = rgbToLab(rgb[0], rgb[1], rgb[2]);
+
+            // 计算 CIELAB 距离的平方 (去掉 Math.sqrt 提升性能，不影响大小比较)
+            const dist = Math.pow(labL - pL, 2) + Math.pow(labA - pA, 2) + Math.pow(labB - pB, 2);
+
+            if (dist < minDist) {
+                minDist = dist;
+                closestCode = code;
+                closestRgb = rgb;
+            }
+        }
+        return {code: closestCode, rgb: closestRgb};
+    }
+
+    // 3. 生成图纸逻辑
+    generateBtn.addEventListener('click', () => {
+        if (!currentImage) return;
+
+        const gridSize = parseInt(gridSizeInput.value) || 48;
+        const cellSize = 20; // 格子大小
+
+        // --- 修改点 1: 定义边距 ---
+        const topPadding = 60;   // 顶部留给色号索引的高度
+        const bottomPadding = 180; // 底部留给统计清单的高度
+
+        // --- 修改点 2: 调整 Canvas 总尺寸 ---
+        canvas.width = gridSize * cellSize;
+        // 高度 = 网格高度 + 顶部预留 + 底部预留
+        canvas.height = (gridSize * cellSize) + topPadding + bottomPadding;
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        // 清空并填充白色背景
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // 创建临时 Canvas 用于压缩图片（实现像素化效果）
+        const tempCanvas = document.createElement('canvas');
+        tempCanvas.width = gridSize;
+        tempCanvas.height = gridSize;
+        const tempCtx = tempCanvas.getContext('2d');
+        tempCtx.drawImage(currentImage, 0, 0, gridSize, gridSize);
+
+        const imageData = tempCtx.getImageData(0, 0, gridSize, gridSize).data;
+        const colorCount = {}; // 用于统计颜色数量
+        const usedColors = new Set(); // 记录用到了哪些颜色
+
+        // --- A. 遍历像素生成中间的主网格 ---
+        for (let y = 0; y < gridSize; y++) {
+            for (let x = 0; x < gridSize; x++) {
+                const index = (y * gridSize + x) * 4;
+                const r = imageData[index];
+                const g = imageData[index + 1];
+                const b = imageData[index + 2];
+
+                const matched = getClosestColor(r, g, b);
+
+                // 统计数据
+                colorCount[matched.code] = (colorCount[matched.code] || 0) + 1;
+                usedColors.add(matched.code);
+
+                // 计算实际绘制坐标 (y * cellSize + topPadding)
+                const drawX = x * cellSize;
+                const drawY = (y * cellSize) + topPadding;
+
+                // 1. 填充格子颜色
+                ctx.fillStyle = `rgb(${matched.rgb.join(',')})`;
+                ctx.fillRect(drawX, drawY, cellSize, cellSize);
+
+                // 2. 绘制格子边框
+                ctx.strokeStyle = '#e0e0e0';
+                ctx.lineWidth = 1;
+                ctx.strokeRect(drawX, drawY, cellSize, cellSize);
+
+                // 3. 绘制格子内的色号文字
+                const brightness = (matched.rgb[0] * 299 + matched.rgb[1] * 587 + matched.rgb[2] * 114) / 1000;
+                ctx.fillStyle = brightness > 128 ? '#000000' : '#ffffff';
+                ctx.font = 'bold 8px Arial';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(matched.code, drawX + cellSize / 2, drawY + cellSize / 2);
+            }
+        }
+
+        // --- B. 绘制顶部索引行 (Row 0) ---
+        // 将用到的颜色排序
+        const usedColorList = Array.from(usedColors).sort();
+
+        usedColorList.forEach((code, index) => {
+            if (index * cellSize >= canvas.width) return; // 防止超出宽度
+
+            const rgb = COLOR_PALETTE[code];
+            const drawX = index * cellSize;
+            const drawY = 0; // 第一行，紧贴顶部
+
+            // 画色块
+            ctx.fillStyle = `rgb(${rgb.join(',')})`;
+            ctx.fillRect(drawX, drawY, cellSize, cellSize);
+
+            // 画边框
+            ctx.strokeStyle = '#333';
+            ctx.strokeRect(drawX, drawY, cellSize, cellSize);
+
+            // 写色号
+            const brightness = (rgb[0] * 299 + rgb[1] * 587 + rgb[2] * 114) / 1000;
+            ctx.fillStyle = brightness > 128 ? '#000' : '#fff';
+            ctx.font = 'bold 10px Arial';
+            ctx.fillText(code, drawX + cellSize / 2, drawY + cellSize / 2);
+        });
+
+        // --- C. 绘制底部统计清单卡片 ---
+        // 1. 绘制卡片背景 (圆角矩形模拟)
+        const cardMargin = 20;
+        const cardWidth = canvas.width - (cardMargin * 2);
+        const sortedColors = Object.entries(colorCount).sort((a, b) => b[1] - a[1]);
+        // 每个条目宽度预估为 140px，计算需要几行，从而得出卡片高度
+        const itemWidth = 140;
+        const itemsPerRow = Math.max(1, Math.floor(cardWidth / itemWidth));
+        const rowCount = Math.ceil(sortedColors.length / itemsPerRow);
+        const cardHeight = 60 + (rowCount * 35) + 20; // 标题区 + 行数*行高 + 底部留白
+        const cardX = cardMargin;
+        const cardY = (gridSize * cellSize) + topPadding + 10;
+
+        // 2. 绘制卡片背景 (带圆角和阴影，提升质感)
+        ctx.save(); // 保存状态，防止阴影影响后续文字
+        ctx.shadowColor = "rgba(0,0,0,0.08)";
+        ctx.shadowBlur = 15;
+        ctx.shadowOffsetY = 5;
+        ctx.fillStyle = '#ffffff';
+
+        // 绘制圆角矩形
+        const radius = 10;
+        ctx.beginPath();
+        ctx.moveTo(cardX + radius, cardY);
+        ctx.lineTo(cardX + cardWidth - radius, cardY);
+        ctx.quadraticCurveTo(cardX + cardWidth, cardY, cardX + cardWidth, cardY + radius);
+        ctx.lineTo(cardX + cardWidth, cardY + cardHeight - radius);
+        ctx.quadraticCurveTo(cardX + cardWidth, cardY + cardHeight, cardX + cardWidth - radius, cardY + cardHeight);
+        ctx.lineTo(cardX + radius, cardY + cardHeight);
+        ctx.quadraticCurveTo(cardX, cardY + cardHeight, cardX, cardY + cardHeight - radius);
+        ctx.lineTo(cardX, cardY + radius);
+        ctx.quadraticCurveTo(cardX, cardY, cardX + radius, cardY);
+        ctx.closePath();
+        ctx.fill();
+        ctx.restore(); // 恢复状态，清除阴影
+
+        // 3. 绘制标题与分割线
+        ctx.fillStyle = '#2c3e50'; // 使用更深的颜色，对比度更高
+        ctx.font = 'bold 16px "Microsoft YaHei", Arial, sans-serif'; // 优先使用微软雅黑，中文更清晰
+        ctx.textAlign = 'left';
+        ctx.textBaseline = 'top';
+        ctx.fillText(`📊 备豆清单 (总计: ${gridSize * gridSize} 颗)`, cardX + 20, cardY + 20);
+
+        ctx.beginPath();
+        ctx.moveTo(cardX + 20, cardY + 48);
+        ctx.lineTo(cardX + cardWidth - 20, cardY + 48);
+        ctx.strokeStyle = '#ecf0f1';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+
+        // 4. 绘制具体的颜色统计项 (网格化排版)
+        let currentX = cardX + 20;
+        let currentY = cardY + 65;
+        const lineHeight = 35; // 增加行高，让呼吸感更强
+
+        sortedColors.forEach(([code, count], index) => {
+            const rgb = COLOR_PALETTE[code];
+
+            // 自动换行逻辑：如果当前 X 加上预估宽度超出了卡片边界，就换行
+            if (currentX + itemWidth > cardX + cardWidth - 20) {
+                currentX = cardX + 20;
+                currentY += lineHeight;
+            }
+
+            // 画小色块 (稍微大一点，并加上细边框，浅色也能看清)
+            ctx.fillStyle = `rgb(${rgb.join(',')})`;
+            ctx.fillRect(currentX, currentY + 4, 16, 16);
+            ctx.strokeStyle = 'rgba(0,0,0,0.1)';
+            ctx.lineWidth = 1;
+            ctx.strokeRect(currentX, currentY + 4, 16, 16);
+
+            // 画色号和数量文字 (纯黑色 + 粗体，解决发虚问题)
+            ctx.fillStyle = '#000000';
+            ctx.font = 'bold 14px "Microsoft YaHei", Arial, sans-serif';
+            ctx.textAlign = 'left';
+            ctx.textBaseline = 'middle';
+
+            const text = `${code}: ${count}颗`;
+            ctx.fillText(text, currentX + 24, currentY + 12);
+
+            // 移动光标到下一个网格位置
+            currentX += itemWidth;
+        });
+
+        exportBtn.disabled = false;
+    });
+
+    // 4. 导出图片
+    exportBtn.addEventListener('click', () => {
+        const link = document.createElement('a');
+        link.download = '拼豆图纸_' + Date.now() + '.png';
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+    });
+</script>
+
+</html>

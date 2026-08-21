@@ -39,7 +39,7 @@ jwt:
   secret: jPhHbslSkahOWlrLV0igAoekBVagWmFwi4RR4PZxdNw=
   expiration: 86400000
 
-# 文件上传配置
+# 本地文件上传配置 --作废
 file:
   upload:
     path: D:/ActionSoft/workspace/code/year-ledger/uploads/avatars/
