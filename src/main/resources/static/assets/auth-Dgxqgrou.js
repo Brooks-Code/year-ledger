@@ -1,0 +1,1 @@
+import{r as e}from"./router-D7lfw5oB.js";function t(t){return e({url:`/auth/login`,method:`post`,data:t})}function n(t){return e({url:`/auth/register`,method:`post`,data:t})}export{n,t};

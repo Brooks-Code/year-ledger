@@ -25,6 +25,9 @@ server:
   port: ${PORT:8080}
   # 让 Spring Boot 信任 Render 的反向代理（解决手机访问 Swagger 报错问题）
   forward-headers-strategy: NATIVE
+  # API 路径前缀
+  servlet:
+    context-path: /api
 
 # 智谱 API 配置
 zhipu:

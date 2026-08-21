@@ -3,53 +3,63 @@ package com.brooks.mall.user.config;
 import com.brooks.mall.user.interceptor.UserAuthInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.web.servlet.resource.PathResourceResolver;
+
+import java.io.IOException;
 
 @Configuration
 public class WebMvcConfig implements WebMvcConfigurer {
 
     @Autowired
     private UserAuthInterceptor userAuthInterceptor;
+
     @Autowired
     private FileUploadConfig fileUploadConfig;
 
-    // 添加拦截器
+    // 1. 拦截器配置
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(userAuthInterceptor)
-                // 拦截所有路径
                 .addPathPatterns("/**")
-                // 排除以下路径
                 .excludePathPatterns(
-                        "/api/auth/login",      // 排除登录
-                        "/api/auth/register",   // 排除注册
-                        "/doc.html",            // 排除 Swagger 文档等
-                        "/api/images/**",       // 排除图片
-                        "/webjars/**",           // 排除 Swagger 静态资源
-                        "/api/user/users"       // 排除用户列表
+                        "/api/auth/login",
+                        "/api/auth/register",
+                        "/api/doc.html",
+                        "/api/images/**",
+                        "/api/webjars/**",
+                        "/api/images/**"
                 );
     }
 
-    // 配置静态资源映射，让前端能访问到图片 -- 映射到实际路径
+    // 2. 静态资源与前端路由兜底配置  -- 配置静态资源映射
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        String prefix = fileUploadConfig.getAccessPrefix();
+        // 1. 图片映射（保持你原来的逻辑，注意加上 /api 前缀）
         String path = fileUploadConfig.getUploadPath();
+        if (path != null && !path.endsWith("/")) path += "/";
+        registry.addResourceHandler("/api/images/**")
+                .addResourceLocations("file:" + path);
 
-        // 防止配置为空导致启动报错
-        if (prefix != null && path != null) {
-            // 确保 path 以 / 结尾，防止拼接错误（视具体框架版本而定，通常 file: 协议比较宽容）
-            if (!path.endsWith("/")) {
-                path = path + "/";
-            }
-
-            registry.addResourceHandler("/api/images/**")
-                    .addResourceLocations("file:" + path);
-            // 禁止 Spring Boot 默认的静态资源处理干扰你
-            registry.addResourceHandler("/webjars/**")
-                    .addResourceLocations("classpath:/META-INF/resources/webjars/");
-        }
+        // 2. 前端静态资源 + 路由兜底（核心修改）
+        registry.addResourceHandler("/api/**") // 拦截所有 /api 开头的请求
+                .addResourceLocations("classpath:/static/") // 指向你的 dist 目录
+                .resourceChain(true)
+                .addResolver(new PathResourceResolver() {
+                    @Override
+                    protected Resource getResource(String resourcePath, Resource location) throws IOException {
+                        Resource requestedResource = location.createRelative(resourcePath);
+                        // 如果请求的是文件（如 js, css, png），直接返回
+                        if (requestedResource.exists() && requestedResource.isReadable()) {
+                            return requestedResource;
+                        }
+                        // 如果是前端路由（如 /api/login），找不到文件，就返回 index.html
+                        return new ClassPathResource("/static/index.html");
+                    }
+                });
     }
 }

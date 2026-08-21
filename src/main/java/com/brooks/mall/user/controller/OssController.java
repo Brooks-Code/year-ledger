@@ -13,7 +13,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/oss")
+@RequestMapping("/oss")
 public class OssController {
     @Autowired
     private OssService ossService;

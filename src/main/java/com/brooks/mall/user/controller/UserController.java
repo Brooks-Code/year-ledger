@@ -19,7 +19,7 @@ import java.util.Map;
  * @Date 2026/7/22 10:29
  */
 @RestController // 返回 JSON 数据
-@RequestMapping("/api/user") // 对应前端的 /api 代理前缀
+@RequestMapping("/user")
 public class UserController {
 
     @Autowired

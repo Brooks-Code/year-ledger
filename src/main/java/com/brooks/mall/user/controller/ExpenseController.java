@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @Date 2026/7/29 13:26
  */
 @RestController // 返回 JSON 数据
-@RequestMapping("/api") // 对应前端的 /api 代理前缀
+@RequestMapping
 public class ExpenseController {
     @Autowired
     private ExpenseService expenseService;
